@@ -1,6 +1,7 @@
 // One function per operationId from openapi.yaml — contracts match YAML exactly
-import { apiFetch } from "./client"
+import { apiFetch, getToken } from "./client"
 import type {
+  TokenResponse,
   AccountResponse,
   DashboardFilters,
   OwnerEnum,
@@ -11,6 +12,20 @@ import type {
   TransactionResponse,
   RecategorizeRequest,
 } from "@/types/api"
+
+export async function login(username: string, password: string): Promise<TokenResponse> {
+  const body = new URLSearchParams({ username, password })
+  const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
+  })
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { detail?: string }
+    throw new Error(err.detail ?? res.statusText)
+  }
+  return res.json() as Promise<TokenResponse>
+}
 
 export function listAccounts(owner?: OwnerEnum): Promise<AccountResponse[]> {
   return apiFetch<AccountResponse[]>("/accounts", { owner })
@@ -58,13 +73,13 @@ export function recategorizeTransaction(
   transactionId: string,
   body: RecategorizeRequest,
 ): Promise<TransactionResponse> {
+  const token = getToken()
+  const headers: Record<string, string> = { "Content-Type": "application/json" }
+  if (token) headers["Authorization"] = `Bearer ${token}`
+
   return fetch(
     `${import.meta.env.VITE_API_BASE_URL}/transactions/${transactionId}/categorize`,
-    {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    },
+    { method: "PATCH", headers, body: JSON.stringify(body) },
   ).then(async (res) => {
     if (!res.ok) {
       const err = (await res.json().catch(() => ({}))) as { detail?: string }

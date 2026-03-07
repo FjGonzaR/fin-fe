@@ -1,5 +1,19 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL as string
 
+export const TOKEN_KEY = "fin_access_token"
+
+export function getToken(): string | null {
+  return localStorage.getItem(TOKEN_KEY)
+}
+
+export function setToken(token: string): void {
+  localStorage.setItem(TOKEN_KEY, token)
+}
+
+export function clearToken(): void {
+  localStorage.removeItem(TOKEN_KEY)
+}
+
 export class ApiError extends Error {
   status: number
   detail: string
@@ -25,7 +39,11 @@ export async function apiFetch<T>(
     }
   }
 
-  const response = await fetch(url.toString())
+  const token = getToken()
+  const headers: Record<string, string> = {}
+  if (token) headers["Authorization"] = `Bearer ${token}`
+
+  const response = await fetch(url.toString(), { headers })
 
   if (!response.ok) {
     let detail = response.statusText

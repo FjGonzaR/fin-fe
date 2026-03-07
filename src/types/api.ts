@@ -65,6 +65,11 @@ export interface TopTransactionItem {
   account_type: AccountTypeEnum
 }
 
+export interface TokenResponse {
+  access_token: string
+  token_type: string
+}
+
 export type CategoryMethod = "RULES" | "LLM" | "USER"
 
 export interface TransactionResponse {
