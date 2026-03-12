@@ -2,7 +2,7 @@
 
 export type BankEnum = "BANCOLOMBIA" | "RAPPI"
 export type OwnerEnum = "PACHO" | "LU"
-export type AccountTypeEnum = "CREDITO" | "DEBITO"
+export type AccountTypeEnum = "CREDITO" | "DEBITO" | "AHORROS"
 export type Category =
   | "HOGAR"
   | "DOMICILIOS"
@@ -19,6 +19,8 @@ export type Category =
   | "COBRO_BANCARIO"
   | "PAGO"
   | "PLATAFORMAS"
+  | "INGRESO"
+  | "INVERSION"
   | "OTROS"
 
 export interface AccountResponse {
@@ -31,12 +33,12 @@ export interface AccountResponse {
 }
 
 export interface KPIResponse {
-  total_spent: number
-  total_abonos: number
+  total_ingresos: number
+  total_gastos: number
+  total_pagos: number
+  total_inversiones: number
   net: number
   transaction_count: number
-  expense_count: number
-  abono_count: number
   avg_monthly_spend: number | null
 }
 

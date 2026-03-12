@@ -20,7 +20,7 @@ import type { Category, TransactionResponse } from "@/types/api"
 const CATEGORIES: Category[] = [
   "HOGAR", "DOMICILIOS", "CARRO", "TRANSPORTE", "OCIO", "RESTAURANTES",
   "ROPA", "SALUD", "PRESTACIONES", "REGALOS", "EDUCACION", "TRABAJO",
-  "COBRO_BANCARIO", "PAGO", "PLATAFORMAS", "OTROS",
+  "COBRO_BANCARIO", "PAGO", "PLATAFORMAS", "INGRESO", "INVERSION", "OTROS",
 ]
 
 interface RecategorizeDialogProps {

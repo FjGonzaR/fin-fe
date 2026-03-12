@@ -39,7 +39,7 @@ export function HistogramChart({ filters }: HistogramChartProps) {
         {isError && <ErrorState message="No se pudo cargar el histograma" />}
         {!isLoading && !isError && (!data || data.length === 0) && <EmptyState />}
         {!isLoading && !isError && data && data.length > 0 && (
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }} barCategoryGap="30%">
               <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
               <XAxis

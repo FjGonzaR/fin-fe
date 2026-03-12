@@ -19,7 +19,7 @@ export function KpiCard({ title, value, subtitle, valueColor = "default", isLoad
           <Skeleton className="mt-2 h-8 w-3/4" />
         ) : (
           <p
-            className={cn("mt-1 text-2xl font-bold tracking-tight", {
+            className={cn("mt-1 text-sm font-bold tracking-tight sm:text-base lg:text-xl", {
               "text-gray-900": valueColor === "default",
               "text-green-600": valueColor === "green",
               "text-red-500": valueColor === "red",

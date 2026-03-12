@@ -2,7 +2,7 @@ import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { LoginPage } from "@/components/auth/LoginPage"
-import { useAuth } from "@/hooks/useAuth"
+import { AuthProvider, useAuth } from "@/context/AuthContext"
 import { buildMonthsParam, getDefaultMonthRange } from "@/lib/dateUtils"
 import type { DashboardFilters } from "@/types/api"
 
@@ -20,8 +20,14 @@ const defaultFilters: DashboardFilters = {
   months: buildMonthsParam(defaultRange.start, defaultRange.end),
 }
 
-function Dashboard() {
+function AppContent() {
+  const { isAuthenticated, isLoading, error, login } = useAuth()
   const [filters, setFilters] = useState<DashboardFilters>(defaultFilters)
+
+  if (!isAuthenticated) {
+    return <LoginPage onLogin={login} isLoading={isLoading} error={error} />
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <DashboardLayout filters={filters} onFiltersChange={setFilters} />
@@ -30,11 +36,9 @@ function Dashboard() {
 }
 
 export default function App() {
-  const { isAuthenticated, isLoading, error, login } = useAuth()
-
-  if (!isAuthenticated) {
-    return <LoginPage onLogin={login} isLoading={isLoading} error={error} />
-  }
-
-  return <Dashboard />
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  )
 }

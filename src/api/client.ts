@@ -2,6 +2,12 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL as string
 
 export const TOKEN_KEY = "fin_access_token"
 
+let onUnauthorized: (() => void) | null = null
+
+export function registerUnauthorizedHandler(handler: () => void): void {
+  onUnauthorized = handler
+}
+
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY)
 }
@@ -46,6 +52,10 @@ export async function apiFetch<T>(
   const response = await fetch(url.toString(), { headers })
 
   if (!response.ok) {
+    if (response.status === 401) {
+      clearToken()
+      onUnauthorized?.()
+    }
     let detail = response.statusText
     try {
       const body = (await response.json()) as { detail?: string }

@@ -1,5 +1,5 @@
 import { BarChart3, LogOut } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/context/AuthContext"
 
 export function Header() {
   const { logout } = useAuth()

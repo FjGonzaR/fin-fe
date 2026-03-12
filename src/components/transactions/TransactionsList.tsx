@@ -16,7 +16,7 @@ import { RecategorizeDialog } from "./RecategorizeDialog"
 import { useTransactions } from "@/hooks/useTransactions"
 import { formatCop } from "@/lib/formatCop"
 import { getCategoryColor } from "@/lib/categoryColors"
-import { PencilIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
+import { PencilIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon } from "lucide-react"
 import type { DashboardFilters, TransactionResponse } from "@/types/api"
 
 const PAGE_SIZE = 20
@@ -28,28 +28,58 @@ interface TransactionsListProps {
 export function TransactionsList({ filters }: TransactionsListProps) {
   const { data, isLoading, isError } = useTransactions(filters)
   const [page, setPage] = useState(0)
+  const [search, setSearch] = useState("")
   const [recategorizing, setRecategorizing] = useState<TransactionResponse | null>(null)
 
-  const total = data?.length ?? 0
+  const filtered = search.trim()
+    ? (data ?? []).filter((txn) => {
+        const q = search.toLowerCase()
+        return (
+          txn.description_clean.toLowerCase().includes(q) ||
+          (txn.merchant_guess ?? "").toLowerCase().includes(q) ||
+          (txn.category ?? "").toLowerCase().includes(q) ||
+          txn.bank_name.toLowerCase().includes(q)
+        )
+      })
+    : (data ?? [])
+
+  const total = filtered.length
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
   const safePage = Math.min(page, totalPages - 1)
-  const pageData = data?.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE) ?? []
+  const pageData = filtered.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE)
 
   const from = total === 0 ? 0 : safePage * PAGE_SIZE + 1
   const to = Math.min(safePage * PAGE_SIZE + PAGE_SIZE, total)
 
+  function handleSearch(value: string) {
+    setSearch(value)
+    setPage(0)
+  }
+
   return (
     <>
       <Card className="rounded-2xl shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-base font-semibold text-gray-800">
-            Transacciones
-          </CardTitle>
-          {!isLoading && total > 0 && (
-            <span className="text-xs text-gray-400">
-              {from}–{to} de {total}
-            </span>
-          )}
+        <CardHeader className="space-y-3 pb-2">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base font-semibold text-gray-800">
+              Transacciones
+            </CardTitle>
+            {!isLoading && total > 0 && (
+              <span className="text-xs text-gray-400">
+                {from}–{to} de {total}
+              </span>
+            )}
+          </div>
+          <div className="relative">
+            <SearchIcon className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder="Buscar por descripción, categoría, banco…"
+              className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-8 pr-4 text-sm text-gray-700 placeholder:text-gray-400 focus:border-gray-400 focus:bg-white focus:outline-none"
+            />
+          </div>
         </CardHeader>
 
         <CardContent className="p-0">
