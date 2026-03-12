@@ -1,6 +1,22 @@
-/** Returns "YYYY-MM,YYYY-MM" string from two month strings */
-export function buildMonthsParam(start: string, end: string): string {
-  return `${start},${end}`
+/** Returns "YYYY-MM-01" (first day of month) */
+export function monthToDateFrom(ym: string): string {
+  return `${ym}-01`
+}
+
+/** Returns the last day of the month as "YYYY-MM-DD" */
+export function monthToDateTo(ym: string): string {
+  const [y, m] = ym.split("-").map(Number)
+  const lastDay = new Date(y, m, 0).getDate()
+  return `${ym}-${String(lastDay).padStart(2, "0")}`
+}
+
+/** Returns the number of calendar months covered by a date range (inclusive).
+ *  e.g. "2026-01-01" → "2026-03-31" = 3 */
+export function countMonths(date_from: string | undefined, date_to: string | undefined): number {
+  if (!date_from || !date_to) return 1
+  const [fy, fm] = date_from.slice(0, 7).split("-").map(Number)
+  const [ty, tm] = date_to.slice(0, 7).split("-").map(Number)
+  return (ty - fy) * 12 + (tm - fm) + 1
 }
 
 /** Returns the last N month strings in "YYYY-MM" format, ending at today */

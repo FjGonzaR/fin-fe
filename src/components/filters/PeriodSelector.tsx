@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { buildMonthsParam, formatMonthLabel } from "@/lib/dateUtils"
+import { monthToDateFrom, monthToDateTo, formatMonthLabel } from "@/lib/dateUtils"
 
 // Fixed range: Jan 2026 → current month
 const MIN_YEAR = 2026
@@ -75,17 +75,19 @@ function MonthGrid({ year, selected, selectionStart, selectionEnd, onSelect, now
 }
 
 interface PeriodSelectorProps {
-  months: string | undefined // "YYYY-MM,YYYY-MM"
-  onChange: (months: string | undefined) => void
+  date_from: string | undefined // "YYYY-MM-DD"
+  date_to: string | undefined   // "YYYY-MM-DD"
+  onChange: (date_from: string | undefined, date_to: string | undefined) => void
 }
 
-export function PeriodSelector({ months, onChange }: PeriodSelectorProps) {
+export function PeriodSelector({ date_from, date_to, onChange }: PeriodSelectorProps) {
   const now = getNow()
   const [open, setOpen] = useState(false)
   const [viewYear, setViewYear] = useState(now.year)
   const [picking, setPicking] = useState<"start" | "end">("start")
 
-  const [start, end] = months ? months.split(",") : ["", ""]
+  const start = date_from ? date_from.slice(0, 7) : ""
+  const end = date_to ? date_to.slice(0, 7) : ""
   const startParsed = start ? parseYM(start) : null
   const endParsed = end ? parseYM(end) : null
 
@@ -98,16 +100,14 @@ export function PeriodSelector({ months, onChange }: PeriodSelectorProps) {
 
   function handleSelect(ym: string) {
     if (picking === "start") {
-      // Reset end, wait for second pick
-      onChange(undefined)
+      // Set temporary same-month range so span is visible; wait for second pick
+      onChange(monthToDateFrom(ym), monthToDateTo(ym))
       setPicking("end")
-      // Store temporary start via a local trick: set months to "start,start" so span is visible
-      onChange(buildMonthsParam(ym, ym))
     } else {
       // Second pick: ensure start <= end
-      const current = months ? months.split(",")[0] : ym
+      const current = start || ym
       const [s, e] = ym >= current ? [current, ym] : [ym, current]
-      onChange(buildMonthsParam(s, e))
+      onChange(monthToDateFrom(s), monthToDateTo(e))
       setPicking("start")
       setOpen(false)
     }

@@ -35,7 +35,8 @@ export function getDashboardKpis(filters: DashboardFilters): Promise<KPIResponse
   return apiFetch<KPIResponse>("/dashboard/kpis", {
     owner: filters.owner,
     account_id: filters.account_id,
-    months: filters.months,
+    date_from: filters.date_from,
+    date_to: filters.date_to,
     category: filters.category,
   })
 }
@@ -44,7 +45,8 @@ export function getDashboardHistogram(filters: DashboardFilters): Promise<Histog
   return apiFetch<HistogramPoint[]>("/dashboard/histogram", {
     owner: filters.owner,
     account_id: filters.account_id,
-    months: filters.months,
+    date_from: filters.date_from,
+    date_to: filters.date_to,
     category: filters.category,
   })
 }
@@ -55,7 +57,8 @@ export function getDashboardByCategory(
   return apiFetch<CategoryBreakdownItem[]>("/dashboard/by-category", {
     owner: filters.owner,
     account_id: filters.account_id,
-    months: filters.months,
+    date_from: filters.date_from,
+    date_to: filters.date_to,
     category: filters.category,
   })
 }
@@ -64,7 +67,8 @@ export function listTransactions(filters: DashboardFilters): Promise<Transaction
   return apiFetch<TransactionResponse[]>("/transactions", {
     owner: filters.owner,
     account_id: filters.account_id,
-    months: filters.months,
+    date_from: filters.date_from,
+    date_to: filters.date_to,
     category: filters.category,
   })
 }
@@ -96,7 +100,8 @@ export function getDashboardTopTransactions(
   return apiFetch<TopTransactionItem[]>("/dashboard/top-transactions", {
     owner: filters.owner,
     account_id: filters.account_id,
-    months: filters.months,
+    date_from: filters.date_from,
+    date_to: filters.date_to,
     limit: String(limit),
   })
 }

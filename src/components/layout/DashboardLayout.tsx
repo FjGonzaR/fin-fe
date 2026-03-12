@@ -4,6 +4,7 @@ import { KpiGrid } from "@/components/kpis/KpiGrid"
 import { HistogramChart } from "@/components/charts/HistogramChart"
 import { CategoryDonut } from "@/components/charts/CategoryDonut"
 import { TransactionsList } from "@/components/transactions/TransactionsList"
+import { BudgetProgress } from "@/components/budget/BudgetProgress"
 import type { DashboardFilters } from "@/types/api"
 
 interface DashboardLayoutProps {
@@ -21,9 +22,11 @@ export function DashboardLayout({ filters, onFiltersChange }: DashboardLayoutPro
           <FilterBar filters={filters} onFiltersChange={onFiltersChange} />
           <KpiGrid filters={filters} />
 
+          <HistogramChart filters={filters} />
+
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <HistogramChart filters={filters} />
             <CategoryDonut filters={filters} />
+            <BudgetProgress filters={filters} />
           </div>
 
           <TransactionsList filters={filters} />

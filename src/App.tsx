@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { LoginPage } from "@/components/auth/LoginPage"
 import { AuthProvider, useAuth } from "@/context/AuthContext"
-import { buildMonthsParam, getDefaultMonthRange } from "@/lib/dateUtils"
+import { getDefaultMonthRange, monthToDateFrom, monthToDateTo } from "@/lib/dateUtils"
 import type { DashboardFilters } from "@/types/api"
 
 const queryClient = new QueryClient({
@@ -17,7 +17,8 @@ const queryClient = new QueryClient({
 
 const defaultRange = getDefaultMonthRange(3)
 const defaultFilters: DashboardFilters = {
-  months: buildMonthsParam(defaultRange.start, defaultRange.end),
+  date_from: monthToDateFrom(defaultRange.start),
+  date_to: monthToDateTo(defaultRange.end),
 }
 
 function AppContent() {

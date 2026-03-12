@@ -19,8 +19,8 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
     onFiltersChange({ ...filters, account_id })
   }
 
-  function handleMonthsChange(months: string | undefined) {
-    onFiltersChange({ ...filters, months })
+  function handlePeriodChange(date_from: string | undefined, date_to: string | undefined) {
+    onFiltersChange({ ...filters, date_from, date_to })
   }
 
   function handleCategoryChange(category: DashboardFilters["category"]) {
@@ -39,7 +39,7 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
       <div className="h-5 w-px bg-gray-200" />
       <CategorySelector value={filters.category} onChange={handleCategoryChange} />
       <div className="ml-auto">
-        <PeriodSelector months={filters.months} onChange={handleMonthsChange} />
+        <PeriodSelector date_from={filters.date_from} date_to={filters.date_to} onChange={handlePeriodChange} />
       </div>
     </div>
   )

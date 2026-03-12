@@ -103,6 +103,7 @@ export interface RecategorizeRequest {
 export interface DashboardFilters {
   owner?: OwnerEnum
   account_id?: string
-  months?: string // "YYYY-MM,YYYY-MM"
+  date_from?: string // "YYYY-MM-DD"
+  date_to?: string   // "YYYY-MM-DD"
   category?: Category
 }
