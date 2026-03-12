@@ -24,12 +24,12 @@ function exceededTextColor(globalNet: number): string {
 }
 
 export function BudgetProgress({ filters }: BudgetProgressProps) {
-  const { data, isLoading, isError, refetch } = useByCategory(filters)
+  const { data, isLoading, isError } = useByCategory(filters)
   const { data: kpis } = useKpis(filters)
   const globalNet = kpis?.net ?? 0
 
   if (isLoading) return <LoadingSpinner />
-  if (isError) return <ErrorState onRetry={() => void refetch()} />
+  if (isError) return <ErrorState />
 
   const months = countMonths(filters.date_from, filters.date_to)
 
