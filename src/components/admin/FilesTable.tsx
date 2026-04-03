@@ -18,7 +18,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import type { FileMetadata, FileStatusEnum } from "@/types/api"
+import type { FileMetadata } from "@/types/api"
 
 interface FilesTableProps {
   files: FileMetadata[] | undefined
