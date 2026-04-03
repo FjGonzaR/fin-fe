@@ -107,3 +107,60 @@ export interface DashboardFilters {
   date_to?: string   // "YYYY-MM-DD"
   category?: Category
 }
+
+export type AppView = "dashboard" | "admin"
+
+export type FileStatusEnum = "UPLOADED" | "PARSING" | "PROCESSED" | "FAILED"
+
+export interface FileMetadata {
+  file_id: string
+  filename: string
+  account_id: string
+  account_name: string
+  status: FileStatusEnum
+  uploaded_at: string
+  hash: string
+}
+
+export interface UploadResponse {
+  file_id: string
+  parse_status: string
+  file_hash: string
+  original_filename: string
+  uploaded_at: string
+}
+
+export interface EtlStatusResponse {
+  file_id: string
+  status: FileStatusEnum
+  rows_processed: number | null
+  error_message: string | null
+}
+
+export interface FileUrlResponse {
+  file_id: string
+  url: string
+  expires_in: number
+}
+
+export interface FilePreviewResponse {
+  file_id: string
+  filename: string
+  columns: string[]
+  rows: Record<string, string | number | null>[]
+  total_rows: number
+}
+
+export interface CreateAccountRequest {
+  bank_name: BankEnum
+  account_name: string
+  owner: OwnerEnum
+  account_type: AccountTypeEnum
+}
+
+export interface UpdateAccountRequest {
+  bank_name?: BankEnum
+  account_name?: string
+  owner?: OwnerEnum
+  account_type?: AccountTypeEnum
+}

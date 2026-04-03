@@ -5,18 +5,20 @@ import { HistogramChart } from "@/components/charts/HistogramChart"
 import { CategoryDonut } from "@/components/charts/CategoryDonut"
 import { TransactionsList } from "@/components/transactions/TransactionsList"
 import { BudgetProgress } from "@/components/budget/BudgetProgress"
-import type { DashboardFilters } from "@/types/api"
+import type { AppView, DashboardFilters } from "@/types/api"
 
 interface DashboardLayoutProps {
   filters: DashboardFilters
   onFiltersChange: (filters: DashboardFilters) => void
+  currentView: AppView
+  onViewChange: (view: AppView) => void
 }
 
-export function DashboardLayout({ filters, onFiltersChange }: DashboardLayoutProps) {
+export function DashboardLayout({ filters, onFiltersChange, currentView, onViewChange }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-7xl">
-        <Header />
+        <Header currentView={currentView} onViewChange={onViewChange} />
 
         <main className="space-y-6 px-6 pb-10">
           <FilterBar filters={filters} onFiltersChange={onFiltersChange} />

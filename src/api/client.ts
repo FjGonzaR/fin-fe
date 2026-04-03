@@ -68,3 +68,39 @@ export async function apiFetch<T>(
 
   return response.json() as Promise<T>
 }
+
+export async function apiMutate<T>(
+  path: string,
+  method: "POST" | "PUT" | "DELETE" | "PATCH",
+  body?: unknown,
+): Promise<T> {
+  const url = new URL(BASE_URL + path)
+  const token = getToken()
+  const headers: Record<string, string> = {}
+  if (token) headers["Authorization"] = `Bearer ${token}`
+  if (body !== undefined) headers["Content-Type"] = "application/json"
+
+  const response = await fetch(url.toString(), {
+    method,
+    headers,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  })
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      clearToken()
+      onUnauthorized?.()
+    }
+    let detail = response.statusText
+    try {
+      const b = (await response.json()) as { detail?: string }
+      if (b.detail) detail = String(b.detail)
+    } catch {
+      // ignore
+    }
+    throw new ApiError(response.status, detail)
+  }
+
+  if (response.status === 204) return undefined as T
+  return response.json() as Promise<T>
+}

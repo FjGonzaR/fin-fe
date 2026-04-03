@@ -1,5 +1,5 @@
 // One function per operationId from openapi.yaml — contracts match YAML exactly
-import { apiFetch, getToken } from "./client"
+import { apiFetch, apiMutate, getToken } from "./client"
 import type {
   TokenResponse,
   AccountResponse,
@@ -11,6 +11,13 @@ import type {
   TopTransactionItem,
   TransactionResponse,
   RecategorizeRequest,
+  FileMetadata,
+  UploadResponse,
+  EtlStatusResponse,
+  FilePreviewResponse,
+  FileUrlResponse,
+  CreateAccountRequest,
+  UpdateAccountRequest,
 } from "@/types/api"
 
 export async function login(username: string, password: string): Promise<TokenResponse> {
@@ -104,4 +111,62 @@ export function getDashboardTopTransactions(
     date_to: filters.date_to,
     limit: String(limit),
   })
+}
+
+// ── Admin: Files ────────────────────────────────────────────────────────────
+
+export function listFiles(): Promise<FileMetadata[]> {
+  return apiFetch<FileMetadata[]>("/files")
+}
+
+export function getFilePreview(fileId: string, limit = 20): Promise<FilePreviewResponse> {
+  return apiFetch<FilePreviewResponse>(`/files/${fileId}/preview`, { limit: String(limit) })
+}
+
+export function getFileUrl(fileId: string): Promise<FileUrlResponse> {
+  return apiFetch<FileUrlResponse>(`/files/${fileId}/url`)
+}
+
+export function deleteFile(fileId: string): Promise<void> {
+  return apiMutate<void>(`/files/${fileId}`, "DELETE")
+}
+
+export function uploadFile(formData: FormData): Promise<UploadResponse> {
+  const token = getToken()
+  const headers: Record<string, string> = {}
+  if (token) headers["Authorization"] = `Bearer ${token}`
+
+  return fetch(`${import.meta.env.VITE_API_BASE_URL}/files/upload`, {
+    method: "POST",
+    headers,
+    body: formData,
+  }).then(async (res) => {
+    if (!res.ok) {
+      const err = (await res.json().catch(() => ({}))) as { detail?: string }
+      throw new Error(err.detail ?? res.statusText)
+    }
+    return res.json() as Promise<UploadResponse>
+  })
+}
+
+export function triggerEtl(fileId: string): Promise<EtlStatusResponse> {
+  return apiMutate<EtlStatusResponse>(`/etl/process/${fileId}`, "POST")
+}
+
+export function resetEtl(fileId: string): Promise<void> {
+  return apiMutate<void>(`/etl/reset/${fileId}`, "DELETE")
+}
+
+// ── Admin: Accounts ─────────────────────────────────────────────────────────
+
+export function createAccount(body: CreateAccountRequest): Promise<AccountResponse> {
+  return apiMutate<AccountResponse>("/accounts", "POST", body)
+}
+
+export function updateAccount(id: string, body: UpdateAccountRequest): Promise<AccountResponse> {
+  return apiMutate<AccountResponse>(`/accounts/${id}`, "PUT", body)
+}
+
+export function deleteAccount(id: string): Promise<void> {
+  return apiMutate<void>(`/accounts/${id}`, "DELETE")
 }
