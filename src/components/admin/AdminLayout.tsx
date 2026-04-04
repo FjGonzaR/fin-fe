@@ -20,7 +20,7 @@ export function AdminLayout({ currentView, onViewChange }: AdminLayoutProps) {
       <div className="mx-auto max-w-7xl">
         <Header currentView={currentView} onViewChange={onViewChange} />
 
-        <main className="space-y-6 px-6 pb-10">
+        <main className="space-y-6 px-4 pb-10 sm:px-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-gray-900">Administración</h2>

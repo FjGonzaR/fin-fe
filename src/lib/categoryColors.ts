@@ -17,6 +17,7 @@ export const CATEGORY_COLORS: Record<string, string> = {
   PLATAFORMAS: "#06b6d4",
   INGRESO: "#16a34a",
   INVERSION: "#0d9488",
+  MOVIMIENTO_ENTRE_BANCOS: "#f59e0b",
   OTROS: "#94a3b8",
   SIN_CATEGORIZAR: "#d1d5db",
 }

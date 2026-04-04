@@ -83,19 +83,19 @@ export function AccountsTab() {
         )}
 
         {accounts?.map((acc) => (
-          <div key={acc.id} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50">
+          <div key={acc.id} className="flex items-center gap-2 px-3 py-3 hover:bg-gray-50 sm:gap-3 sm:px-4">
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-800">
-                {acc.bank_name} · {TYPE_LABELS[acc.account_type] ?? acc.account_type}
-              </p>
-              <p className="text-xs text-gray-500 truncate">{acc.account_name}</p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-sm font-medium text-gray-800">
+                  {acc.bank_name} · {TYPE_LABELS[acc.account_type] ?? acc.account_type}
+                </p>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${OWNER_COLORS[acc.owner] ?? "bg-gray-100 text-gray-600"}`}>
+                  {acc.owner}
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 truncate mt-0.5">{acc.account_name}</p>
             </div>
-            <span
-              className={`rounded-full px-2 py-0.5 text-xs font-medium ${OWNER_COLORS[acc.owner] ?? "bg-gray-100 text-gray-600"}`}
-            >
-              {acc.owner}
-            </span>
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1">
               <button
                 title="Editar"
                 onClick={() => handleEdit(acc)}

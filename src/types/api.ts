@@ -1,6 +1,6 @@
 // Types derived strictly from fin-be/openapi.yaml — do not invent fields
 
-export type BankEnum = "BANCOLOMBIA" | "RAPPI"
+export type BankEnum = "BANCOLOMBIA" | "RAPPI" | "FALABELLA" | "NEQUI"
 export type OwnerEnum = "PACHO" | "LU"
 export type AccountTypeEnum = "CREDITO" | "DEBITO" | "AHORROS"
 export type Category =
@@ -21,6 +21,7 @@ export type Category =
   | "PLATAFORMAS"
   | "INGRESO"
   | "INVERSION"
+  | "MOVIMIENTO_ENTRE_BANCOS"
   | "OTROS"
 
 export interface AccountResponse {

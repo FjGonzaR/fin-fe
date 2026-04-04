@@ -23,7 +23,7 @@ interface AccountFormDialogProps {
   onOpenChange: (open: boolean) => void
 }
 
-const BANKS: BankEnum[] = ["BANCOLOMBIA", "RAPPI"]
+const BANKS: BankEnum[] = ["BANCOLOMBIA", "RAPPI", "FALABELLA", "NEQUI"]
 const OWNERS: OwnerEnum[] = ["PACHO", "LU"]
 const TYPES: AccountTypeEnum[] = ["CREDITO", "DEBITO", "AHORROS"]
 
