@@ -1,16 +1,16 @@
 import type { Category } from "@/types/api";
 export const CATEGORY_BUDGETS: Partial<Record<Category, number>> = {
-  HOGAR: 5_500_000,
-  RESTAURANTES: 1_200_000,
-  DOMICILIOS: 600_000,
-  OCIO: 1_200_000,
-  CARRO: 1_000_000,
-  TRANSPORTE: 350_000,
-  ROPA: 300_000,
+  HOGAR: 5_500_000, // arriendo 3.2M
+  RESTAURANTES: 1_500_000, // 2 veces por semana (max. 40.000) = 640_000 + 4 salidas por mes (max. 60.000) = 480_000 + 1 top = 300.000
+  DOMICILIOS: 500_000, // 1 vez por semana (max. 50.000 c/u) = 200_000
+  OCIO: 1_000_000, // 500k cada uno
+  CARRO: 1_200_000, // 500k aprox en gasolina y parqueadero
+  TRANSPORTE: 300_000, // 30 ubers al mes
+  ROPA: 150_000, // 1 prenda top cada 3 meses
   SALUD: 1_900_000,
   EDUCACION: 800_000,
-  TRABAJO: 200_000,
-  PLATAFORMAS: 150_000,
-  OTROS: 100_000,
+  TRABAJO: 120_000,
+  PLATAFORMAS: 200_000,
+  OTROS: 400_000,
   REGALOS: 100_000,
 };
