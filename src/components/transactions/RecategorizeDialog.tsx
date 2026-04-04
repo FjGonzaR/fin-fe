@@ -15,13 +15,8 @@ import {
 } from "@/components/ui/select"
 import { useRecategorize } from "@/hooks/useRecategorize"
 import { getCategoryColor } from "@/lib/categoryColors"
+import { useCategories } from "@/hooks/useCategories"
 import type { Category, TransactionResponse } from "@/types/api"
-
-const CATEGORIES: Category[] = [
-  "HOGAR", "DOMICILIOS", "CARRO", "TRANSPORTE", "OCIO", "RESTAURANTES",
-  "ROPA", "SALUD", "PRESTACIONES", "REGALOS", "EDUCACION", "TRABAJO",
-  "COBRO_BANCARIO", "PAGO", "PLATAFORMAS", "INGRESO", "INVERSION", "OTROS",
-]
 
 interface RecategorizeDialogProps {
   transaction: TransactionResponse
@@ -34,6 +29,7 @@ export function RecategorizeDialog({ transaction, open, onOpenChange }: Recatego
     (transaction.category as Category | null) ?? ""
   )
   const { mutate, isPending, isSuccess, reset } = useRecategorize()
+  const { data: categories = [] } = useCategories()
 
   function handleSubmit() {
     if (!selected) return
@@ -76,7 +72,7 @@ export function RecategorizeDialog({ transaction, open, onOpenChange }: Recatego
               <SelectValue placeholder="Selecciona una categoría" />
             </SelectTrigger>
             <SelectContent>
-              {CATEGORIES.map((cat) => (
+              {categories.map((cat) => (
                 <SelectItem key={cat} value={cat}>
                   <div className="flex items-center gap-2">
                     <span

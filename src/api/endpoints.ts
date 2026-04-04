@@ -38,6 +38,10 @@ export function listAccounts(owner?: OwnerEnum): Promise<AccountResponse[]> {
   return apiFetch<AccountResponse[]>("/accounts", { owner })
 }
 
+export function listCategories(spendingOnly = false): Promise<string[]> {
+  return apiFetch<string[]>("/categories", { spending_only: spendingOnly ? "true" : undefined })
+}
+
 export function getDashboardKpis(filters: DashboardFilters): Promise<KPIResponse> {
   return apiFetch<KPIResponse>("/dashboard/kpis", {
     owner: filters.owner,

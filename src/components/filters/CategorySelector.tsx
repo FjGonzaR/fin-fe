@@ -6,13 +6,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { getCategoryColor } from "@/lib/categoryColors"
+import { useCategories } from "@/hooks/useCategories"
 import type { Category } from "@/types/api"
-
-const CATEGORIES: Category[] = [
-  "HOGAR", "DOMICILIOS", "CARRO", "TRANSPORTE", "OCIO", "RESTAURANTES",
-  "ROPA", "SALUD", "PRESTACIONES", "REGALOS", "EDUCACION", "TRABAJO",
-  "COBRO_BANCARIO", "PAGO", "PLATAFORMAS", "OTROS",
-]
 
 interface CategorySelectorProps {
   value: Category | undefined
@@ -20,6 +15,8 @@ interface CategorySelectorProps {
 }
 
 export function CategorySelector({ value, onChange }: CategorySelectorProps) {
+  const { data: categories = [] } = useCategories(true)
+
   function handleChange(next: string) {
     onChange(next === "__all__" ? undefined : (next as Category))
   }
@@ -31,7 +28,7 @@ export function CategorySelector({ value, onChange }: CategorySelectorProps) {
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="__all__">Todas las categorías</SelectItem>
-        {CATEGORIES.map((cat) => (
+        {categories.map((cat) => (
           <SelectItem key={cat} value={cat}>
             <div className="flex items-center gap-2">
               <span
