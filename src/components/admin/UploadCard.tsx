@@ -97,7 +97,7 @@ export function UploadCard() {
           id: "error",
           filename: uploadData.original_filename,
           message: err.message,
-          fileId: uploadData.file_id,
+          fileId,
         })
       },
     })
