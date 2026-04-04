@@ -20,6 +20,25 @@ export function clearToken(): void {
   localStorage.removeItem(TOKEN_KEY)
 }
 
+// FastAPI can return detail as a string or as an array of validation error objects
+function parseDetail(detail: unknown): string {
+  if (typeof detail === "string") return detail
+  if (Array.isArray(detail)) {
+    return detail
+      .map((e) => {
+        if (typeof e === "object" && e !== null && "msg" in e) {
+          const loc = Array.isArray((e as Record<string, unknown>).loc)
+            ? ((e as Record<string, unknown>).loc as string[]).slice(1).join(" → ")
+            : ""
+          return loc ? `${loc}: ${String((e as Record<string, unknown>).msg)}` : String((e as Record<string, unknown>).msg)
+        }
+        return String(e)
+      })
+      .join(", ")
+  }
+  return JSON.stringify(detail)
+}
+
 export class ApiError extends Error {
   status: number
   detail: string
@@ -58,8 +77,8 @@ export async function apiFetch<T>(
     }
     let detail = response.statusText
     try {
-      const body = (await response.json()) as { detail?: string }
-      if (body.detail) detail = String(body.detail)
+      const body = (await response.json()) as { detail?: unknown }
+      if (body.detail !== undefined) detail = parseDetail(body.detail)
     } catch {
       // ignore parse error
     }
@@ -93,8 +112,8 @@ export async function apiMutate<T>(
     }
     let detail = response.statusText
     try {
-      const b = (await response.json()) as { detail?: string }
-      if (b.detail) detail = String(b.detail)
+      const b = (await response.json()) as { detail?: unknown }
+      if (b.detail !== undefined) detail = parseDetail(b.detail)
     } catch {
       // ignore
     }

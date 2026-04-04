@@ -123,7 +123,8 @@ export interface FileMetadata {
 }
 
 export interface UploadResponse {
-  file_id: string
+  file_id?: string   // per spec
+  id?: string        // actual backend field (matches AccountResponse pattern)
   parse_status: string
   file_hash: string
   original_filename: string
@@ -131,10 +132,10 @@ export interface UploadResponse {
 }
 
 export interface EtlStatusResponse {
-  file_id: string
-  status: FileStatusEnum
-  rows_processed: number | null
-  error_message: string | null
+  parsed_rows: number
+  inserted_transactions: number
+  duplicates_skipped: number
+  status: "PROCESSED" | "ALREADY_PROCESSED" | "FAILED"
 }
 
 export interface FileUrlResponse {
