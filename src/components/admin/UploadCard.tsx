@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import { UploadCloud, FileText, Play, Loader2, CheckCircle2, XCircle, RotateCcw } from "lucide-react"
+import { UploadCloud, FileText, Play, Loader2, CheckCircle2, XCircle, RotateCcw, Lock } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import {
   Select,
@@ -31,6 +31,7 @@ type Step =
 export function UploadCard() {
   const [file, setFile] = useState<File | null>(null)
   const [accountId, setAccountId] = useState<string>("")
+  const [password, setPassword] = useState<string>("")
   const [isDragging, setIsDragging] = useState(false)
   const [step, setStep] = useState<Step>({ id: "idle" })
   const inputRef = useRef<HTMLInputElement>(null)
@@ -43,6 +44,7 @@ export function UploadCard() {
     setStep({ id: "idle" })
     setFile(null)
     setAccountId("")
+    setPassword("")
     if (inputRef.current) inputRef.current.value = ""
   }
 
@@ -62,7 +64,7 @@ export function UploadCard() {
     if (!file || !accountId) return
     setStep({ id: "uploading" })
     uploadMutation.mutate(
-      { file, accountId },
+      { file, accountId, password: password || undefined },
       {
         onSuccess: (data) => {
           setStep({ id: "uploaded", data })
@@ -175,6 +177,18 @@ export function UploadCard() {
                 ))}
               </SelectContent>
             </Select>
+
+            <div className="relative">
+              <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={step.id === "uploading"}
+                placeholder="Contraseña (opcional)"
+                className="w-44 rounded-lg border border-gray-200 bg-white pl-8 pr-3 py-2 text-sm text-gray-700 placeholder:text-gray-400 outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 disabled:opacity-50"
+              />
+            </div>
 
             <button
               onClick={handleUpload}

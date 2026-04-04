@@ -4,11 +4,12 @@ import type { UploadResponse } from "@/types/api"
 
 export function useUploadFile() {
   const queryClient = useQueryClient()
-  return useMutation<UploadResponse, Error, { file: File; accountId: string }>({
-    mutationFn: ({ file, accountId }) => {
+  return useMutation<UploadResponse, Error, { file: File; accountId: string; password?: string }>({
+    mutationFn: ({ file, accountId, password }) => {
       const formData = new FormData()
       formData.append("file", file)
       formData.append("account_id", accountId)
+      if (password) formData.append("file_password", password)
       return uploadFile(formData)
     },
     onSuccess: () => {
