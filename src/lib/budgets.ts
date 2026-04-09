@@ -1,7 +1,7 @@
 import type { Category } from "@/types/api";
 export const CATEGORY_BUDGETS: Partial<Record<Category, number>> = {
   HOGAR: 5_500_000, // arriendo 3.2M
-  RESTAURANTES: 1_500_000, // 2 veces por semana (max. 40.000) = 640_000 + 4 salidas por mes (max. 60.000) = 480_000 + 1 top = 300.000
+  RESTAURANTES: 1_750_000, // 1 almuerzo entre semana (max. 40.000) = 320_000 + 8 salidas ricas por mes (max. 60.000) = 960_000 + 1 salida a Vacu a la semana(max. 40.000) + 1 top (300.000)
   DOMICILIOS: 500_000, // 1 vez por semana (max. 50.000 c/u) = 400_000
   OCIO: 1_250_000, // 500k cada uno + 250k salidas juntos
   CARRO: 1_200_000, // 500k aprox en gasolina y parqueadero
@@ -16,4 +16,8 @@ export const CATEGORY_BUDGETS: Partial<Record<Category, number>> = {
   PRESTACIONES: 500_000, // Independiente Lu
 };
 
-// 2.9M libres
+// 2.155M libres
+
+// COMIDAS SEMANALES:
+// L - V: 2 COMIDAS (1 RESTAURANTES, 1 DOMICILIO)
+// V - D: 3 COMIDAS (2 RESTAURANTES cheveres, 1 VACU)
