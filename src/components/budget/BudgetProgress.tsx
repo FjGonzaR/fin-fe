@@ -6,7 +6,7 @@ import { useKpis } from "@/hooks/useKpis"
 import { CATEGORY_BUDGETS } from "@/lib/budgets"
 import { getCategoryColor } from "@/lib/categoryColors"
 import { formatCop } from "@/lib/formatCop"
-import { countMonths } from "@/lib/dateUtils"
+import { countDays } from "@/lib/dateUtils"
 import type { DashboardFilters, Category } from "@/types/api"
 
 interface BudgetProgressProps {
@@ -31,7 +31,7 @@ export function BudgetProgress({ filters }: BudgetProgressProps) {
   if (isLoading) return <LoadingSpinner />
   if (isError) return <ErrorState />
 
-  const months = countMonths(filters.date_from, filters.date_to)
+  const days = countDays(filters.date_from, filters.date_to)
 
   const spendByCategory = new Map<string, number>()
   for (const item of data ?? []) {
@@ -39,7 +39,7 @@ export function BudgetProgress({ filters }: BudgetProgressProps) {
   }
 
   const rows = (Object.keys(CATEGORY_BUDGETS) as Category[]).map((cat) => {
-    const budget = (CATEGORY_BUDGETS[cat] ?? 0) * months
+    const budget = (CATEGORY_BUDGETS[cat] ?? 0) * (days / 30)
     const spent = spendByCategory.get(cat) ?? 0
     const pct = budget > 0 ? (spent / budget) * 100 : 0
     return { cat, budget, spent, pct }

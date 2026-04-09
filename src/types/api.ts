@@ -40,7 +40,7 @@ export interface KPIResponse {
   total_inversiones: number
   net: number
   transaction_count: number
-  avg_monthly_spend: number | null
+  avg_daily_spend: number | null
 }
 
 export interface HistogramPoint {
