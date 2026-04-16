@@ -46,8 +46,8 @@ export function KpiGrid({ filters }: KpiGridProps) {
         valueColor={net >= 0 ? "green" : "red"}
       />
       <KpiCard
-        title="Gasto Promedio/Mes"
-        value={data ? (data.avg_monthly_spend != null ? formatCop(data.avg_monthly_spend) : "—") : "—"}
+        title="Gasto Promedio/Día"
+        value={data ? (data.avg_daily_spend != null ? formatCop(data.avg_daily_spend) : "—") : "—"}
         isLoading={isLoading}
       />
       <KpiCard

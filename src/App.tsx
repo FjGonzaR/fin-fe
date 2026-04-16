@@ -4,7 +4,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { AdminLayout } from "@/components/admin/AdminLayout"
 import { LoginPage } from "@/components/auth/LoginPage"
 import { AuthProvider, useAuth } from "@/context/AuthContext"
-import { getDefaultMonthRange, monthToDateFrom, monthToDateTo } from "@/lib/dateUtils"
+import { getDefaultDayRange } from "@/lib/dateUtils"
 import type { AppView, DashboardFilters } from "@/types/api"
 
 const queryClient = new QueryClient({
@@ -16,11 +16,7 @@ const queryClient = new QueryClient({
   },
 })
 
-const defaultRange = getDefaultMonthRange(3)
-const defaultFilters: DashboardFilters = {
-  date_from: monthToDateFrom(defaultRange.start),
-  date_to: monthToDateTo(defaultRange.end),
-}
+const defaultFilters: DashboardFilters = getDefaultDayRange()
 
 function AppContent() {
   const { isAuthenticated, isLoading, error, login } = useAuth()

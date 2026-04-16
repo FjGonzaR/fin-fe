@@ -52,3 +52,37 @@ function toYearMonth(date: Date): string {
   const m = String(date.getMonth() + 1).padStart(2, "0")
   return `${y}-${m}`
 }
+
+function toLocalDateStr(d: Date): string {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, "0")
+  const day = String(d.getDate()).padStart(2, "0")
+  return `${y}-${m}-${day}`
+}
+
+/** Default range: 15th of month-before-last → 15th of previous month */
+export function getDefaultDayRange(): { date_from: string; date_to: string } {
+  const now = new Date()
+  return {
+    date_from: toLocalDateStr(new Date(now.getFullYear(), now.getMonth() - 2, 15)),
+    date_to: toLocalDateStr(new Date(now.getFullYear(), now.getMonth() - 1, 15)),
+  }
+}
+
+/** Days between two YYYY-MM-DD dates, inclusive */
+export function countDays(date_from: string | undefined, date_to: string | undefined): number {
+  if (!date_from || !date_to) return 30
+  const [fy, fm, fd] = date_from.split("-").map(Number)
+  const [ty, tm, td] = date_to.split("-").map(Number)
+  const from = new Date(fy, fm - 1, fd)
+  const to = new Date(ty, tm - 1, td)
+  return Math.round((to.getTime() - from.getTime()) / 86_400_000) + 1
+}
+
+/** Short label for a YYYY-MM-DD date, e.g. "15 feb. 26" */
+export function formatDateLabel(dateStr: string): string {
+  const [y, m, d] = dateStr.split("-").map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString("es-CO", {
+    day: "numeric", month: "short", year: "2-digit",
+  })
+}

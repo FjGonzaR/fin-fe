@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "fin-fe (Vite dev)",
+      "runtimeExecutable": "/Users/fragonzr/.nvm/versions/node/v20.19.0/bin/node",
+      "runtimeArgs": ["/Users/fragonzr/Documents/dashboard-finanzas/finanzas/fin-fe/node_modules/.bin/vite", "--config", "/Users/fragonzr/Documents/dashboard-finanzas/finanzas/fin-fe/.claude/worktrees/sweet-blackburn/vite.config.ts"],
+      "port": 5173
+    },
+    {
+      "name": "fin-be (FastAPI/uvicorn)",
+      "runtimeExecutable": "/usr/local/opt/python@3.13/bin/python3.13",
+      "runtimeArgs": ["-c", "import sys; sys.path.insert(0, '/Users/fragonzr/Documents/dashboard-finanzas/finanzas/fin-be/venv/lib/python3.13/site-packages'); sys.path.insert(0, '/Users/fragonzr/Documents/dashboard-finanzas/finanzas/fin-be'); import uvicorn; uvicorn.run('app.main:app', reload=True)"],
+      "port": 8000
+    }
+  ]
+}
