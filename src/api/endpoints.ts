@@ -18,6 +18,9 @@ import type {
   FileUrlResponse,
   CreateAccountRequest,
   UpdateAccountRequest,
+  RegisterRequest,
+  InviteTokenResponse,
+  UserSummary,
 } from "@/types/api"
 
 export async function login(username: string, password: string): Promise<TokenResponse> {
@@ -173,4 +176,31 @@ export function updateAccount(id: string, body: UpdateAccountRequest): Promise<A
 
 export function deleteAccount(id: string): Promise<void> {
   return apiMutate<void>(`/accounts/${id}`, "DELETE")
+}
+
+// ── Auth: Multi-user ─────────────────────────────────────────────────────────
+
+export async function register(body: RegisterRequest): Promise<TokenResponse> {
+  const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { detail?: string }
+    throw new Error(err.detail ?? res.statusText)
+  }
+  return res.json() as Promise<TokenResponse>
+}
+
+export function generateInvite(): Promise<InviteTokenResponse> {
+  return apiMutate<InviteTokenResponse>("/admin/invite", "POST")
+}
+
+export function listUsers(): Promise<UserSummary[]> {
+  return apiFetch<UserSummary[]>("/admin/users")
+}
+
+export function promoteUser(userId: string): Promise<UserSummary> {
+  return apiMutate<UserSummary>(`/admin/users/${userId}/promote`, "PATCH")
 }

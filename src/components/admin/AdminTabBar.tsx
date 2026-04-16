@@ -1,7 +1,7 @@
-import { FileText, CreditCard } from "lucide-react"
+import { FileText, CreditCard, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-type AdminTab = "files" | "accounts"
+type AdminTab = "files" | "accounts" | "users"
 
 interface AdminTabBarProps {
   activeTab: AdminTab
@@ -11,6 +11,7 @@ interface AdminTabBarProps {
 const TABS: { id: AdminTab; label: string; icon: React.ElementType }[] = [
   { id: "files", label: "Archivos", icon: FileText },
   { id: "accounts", label: "Cuentas", icon: CreditCard },
+  { id: "users", label: "Usuarios", icon: Users },
 ]
 
 export function AdminTabBar({ activeTab, onTabChange }: AdminTabBarProps) {

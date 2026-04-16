@@ -71,6 +71,7 @@ export interface TopTransactionItem {
 export interface TokenResponse {
   access_token: string
   token_type: string
+  is_admin: boolean
 }
 
 export type CategoryMethod = "RULES" | "LLM" | "USER"
@@ -109,7 +110,25 @@ export interface DashboardFilters {
   category?: Category
 }
 
-export type AppView = "dashboard" | "admin"
+export type AppView = "dashboard" | "account" | "admin"
+
+export interface RegisterRequest {
+  username: string
+  password: string
+  invite_token: string
+}
+
+export interface InviteTokenResponse {
+  invite_token: string
+  expires_at: string
+}
+
+export interface UserSummary {
+  id: string
+  username: string
+  is_admin: boolean
+  created_at: string
+}
 
 export type FileStatusEnum = "UPLOADED" | "PARSING" | "PROCESSED" | "FAILED"
 

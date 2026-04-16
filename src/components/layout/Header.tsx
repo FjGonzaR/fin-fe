@@ -1,4 +1,4 @@
-import { BarChart3, LayoutDashboard, Settings2, LogOut } from "lucide-react"
+import { BarChart3, LayoutDashboard, Settings2, LogOut, UserCircle, FolderOpen } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 import { cn } from "@/lib/utils"
 import type { AppView } from "@/types/api"
@@ -8,13 +8,14 @@ interface HeaderProps {
   onViewChange: (view: AppView) => void
 }
 
-const NAV_ITEMS: { id: AppView; label: string; icon: React.ElementType }[] = [
+const NAV_ITEMS: { id: AppView; label: string; icon: React.ElementType; adminOnly?: boolean }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "admin", label: "Admin", icon: Settings2 },
+  { id: "account", label: "Mi cuenta", icon: FolderOpen },
+  { id: "admin", label: "Admin", icon: Settings2, adminOnly: true },
 ]
 
 export function Header({ currentView, onViewChange }: HeaderProps) {
-  const { logout } = useAuth()
+  const { logout, isAdmin, username } = useAuth()
 
   return (
     <header className="flex items-center gap-2 px-4 py-3 sm:gap-3 sm:px-6 sm:py-4">
@@ -26,8 +27,15 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
         <p className="hidden text-xs text-gray-400 sm:block">Dashboard personal</p>
       </div>
 
+      {username && (
+        <div className="flex shrink-0 items-center gap-1 text-xs text-gray-500">
+          <UserCircle className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">{username}</span>
+        </div>
+      )}
+
       <nav className="flex flex-1 items-center justify-center gap-0.5 sm:gap-1">
-        {NAV_ITEMS.map(({ id, label, icon: Icon }) => (
+        {NAV_ITEMS.filter(({ adminOnly }) => !adminOnly || isAdmin).map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             onClick={() => onViewChange(id)}

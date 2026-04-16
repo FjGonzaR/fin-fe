@@ -1,8 +1,9 @@
 import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
+import { AccountLayout } from "@/components/account/AccountLayout"
 import { AdminLayout } from "@/components/admin/AdminLayout"
-import { LoginPage } from "@/components/auth/LoginPage"
+import { AuthPage } from "@/components/auth/AuthPage"
 import { AuthProvider, useAuth } from "@/context/AuthContext"
 import { getDefaultDayRange } from "@/lib/dateUtils"
 import type { AppView, DashboardFilters } from "@/types/api"
@@ -19,34 +20,36 @@ const queryClient = new QueryClient({
 const defaultFilters: DashboardFilters = getDefaultDayRange()
 
 function AppContent() {
-  const { isAuthenticated, isLoading, error, login } = useAuth()
+  const { isAuthenticated, isAdmin } = useAuth()
   const [filters, setFilters] = useState<DashboardFilters>(defaultFilters)
   const [view, setView] = useState<AppView>("dashboard")
 
-  if (!isAuthenticated) {
-    return <LoginPage onLogin={login} isLoading={isLoading} error={error} />
-  }
+  if (!isAuthenticated) return <AuthPage />
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      {view === "dashboard" ? (
-        <DashboardLayout
-          filters={filters}
-          onFiltersChange={setFilters}
-          currentView={view}
-          onViewChange={setView}
-        />
-      ) : (
-        <AdminLayout currentView={view} onViewChange={setView} />
-      )}
-    </QueryClientProvider>
-  )
+  const safeView: AppView = view === "admin" && !isAdmin ? "dashboard" : view
+
+  if (safeView === "dashboard") {
+    return (
+      <DashboardLayout
+        filters={filters}
+        onFiltersChange={setFilters}
+        currentView={safeView}
+        onViewChange={setView}
+      />
+    )
+  }
+  if (safeView === "account") {
+    return <AccountLayout currentView={safeView} onViewChange={setView} />
+  }
+  return <AdminLayout currentView={safeView} onViewChange={setView} />
 }
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </QueryClientProvider>
   )
 }
