@@ -21,6 +21,11 @@ import type {
   RegisterRequest,
   InviteTokenResponse,
   UserSummary,
+  Category,
+  CategoryKeyword,
+  CreateCategoryRequest,
+  UpdateCategoryRequest,
+  CreateCategoryKeywordRequest,
 } from "@/types/api"
 
 export async function login(username: string, password: string): Promise<TokenResponse> {
@@ -41,8 +46,8 @@ export function listAccounts(owner?: OwnerEnum): Promise<AccountResponse[]> {
   return apiFetch<AccountResponse[]>("/accounts", { owner })
 }
 
-export function listCategories(spendingOnly = false): Promise<string[]> {
-  return apiFetch<string[]>("/categories", { spending_only: spendingOnly ? "true" : undefined })
+export function listCategories(spendingOnly = false): Promise<Category[]> {
+  return apiFetch<Category[]>("/categories", { spending_only: spendingOnly ? "true" : undefined })
 }
 
 export function getDashboardKpis(filters: DashboardFilters): Promise<KPIResponse> {
@@ -91,20 +96,11 @@ export function recategorizeTransaction(
   transactionId: string,
   body: RecategorizeRequest,
 ): Promise<TransactionResponse> {
-  const token = getToken()
-  const headers: Record<string, string> = { "Content-Type": "application/json" }
-  if (token) headers["Authorization"] = `Bearer ${token}`
-
-  return fetch(
-    `${import.meta.env.VITE_API_BASE_URL}/transactions/${transactionId}/categorize`,
-    { method: "PATCH", headers, body: JSON.stringify(body) },
-  ).then(async (res) => {
-    if (!res.ok) {
-      const err = (await res.json().catch(() => ({}))) as { detail?: string }
-      throw new Error(err.detail ?? res.statusText)
-    }
-    return res.json() as Promise<TransactionResponse>
-  })
+  return apiMutate<TransactionResponse>(
+    `/transactions/${transactionId}/categorize`,
+    "PATCH",
+    body,
+  )
 }
 
 export function getDashboardTopTransactions(
@@ -203,4 +199,40 @@ export function listUsers(): Promise<UserSummary[]> {
 
 export function promoteUser(userId: string): Promise<UserSummary> {
   return apiMutate<UserSummary>(`/admin/users/${userId}/promote`, "PATCH")
+}
+
+// ── Admin: Categories ───────────────────────────────────────────────────────
+
+export function listAdminCategories(includeInactive = false): Promise<Category[]> {
+  return apiFetch<Category[]>("/admin/categories", {
+    include_inactive: includeInactive ? "true" : undefined,
+  })
+}
+
+export function createCategory(body: CreateCategoryRequest): Promise<Category> {
+  return apiMutate<Category>("/admin/categories", "POST", body)
+}
+
+export function updateCategory(id: string, body: UpdateCategoryRequest): Promise<Category> {
+  return apiMutate<Category>(`/admin/categories/${id}`, "PATCH", body)
+}
+
+export function deleteCategory(id: string, reassignTo?: string): Promise<void> {
+  const qs = reassignTo ? `?reassign_to=${encodeURIComponent(reassignTo)}` : ""
+  return apiMutate<void>(`/admin/categories/${id}${qs}`, "DELETE")
+}
+
+export function listCategoryKeywords(id: string): Promise<CategoryKeyword[]> {
+  return apiFetch<CategoryKeyword[]>(`/admin/categories/${id}/keywords`)
+}
+
+export function createCategoryKeyword(
+  id: string,
+  body: CreateCategoryKeywordRequest,
+): Promise<CategoryKeyword> {
+  return apiMutate<CategoryKeyword>(`/admin/categories/${id}/keywords`, "POST", body)
+}
+
+export function deleteCategoryKeyword(id: string, kid: string): Promise<void> {
+  return apiMutate<void>(`/admin/categories/${id}/keywords/${kid}`, "DELETE")
 }

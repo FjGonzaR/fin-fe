@@ -3,26 +3,43 @@
 export type BankEnum = "BANCOLOMBIA" | "RAPPI" | "FALABELLA" | "NEQUI"
 export type OwnerEnum = "PACHO" | "LU"
 export type AccountTypeEnum = "CREDITO" | "DEBITO" | "AHORROS"
-export type Category =
-  | "HOGAR"
-  | "DOMICILIOS"
-  | "CARRO"
-  | "TRANSPORTE"
-  | "OCIO"
-  | "RESTAURANTES"
-  | "ROPA"
-  | "SALUD"
-  | "PRESTACIONES"
-  | "REGALOS"
-  | "EDUCACION"
-  | "TRABAJO"
-  | "COBRO_BANCARIO"
-  | "PAGO"
-  | "PLATAFORMAS"
-  | "INGRESO"
-  | "INVERSION"
-  | "MOVIMIENTO_ENTRE_BANCOS"
-  | "OTROS"
+export type CategorySlug = string
+
+export interface Category {
+  id: string
+  slug: string
+  name: string
+  description: string | null
+  is_active: boolean
+  is_system: boolean
+}
+
+export interface CategoryKeyword {
+  id: string
+  category_id: string
+  keyword: string
+  origin: "MANUAL" | "LEARNED"
+  weight: number
+  is_active: boolean
+}
+
+export interface CreateCategoryRequest {
+  slug: string
+  name: string
+  description?: string | null
+  is_active?: boolean
+}
+
+export interface UpdateCategoryRequest {
+  slug?: string
+  name?: string
+  description?: string | null
+  is_active?: boolean
+}
+
+export interface CreateCategoryKeywordRequest {
+  keyword: string
+}
 
 export interface AccountResponse {
   id: string
@@ -86,7 +103,8 @@ export interface TransactionResponse {
   currency: string
   merchant_guess: string | null
   details_json: Record<string, unknown> | null
-  category: Category | null
+  category: string | null
+  category_id: string | null
   category_confidence: number | null
   category_method: CategoryMethod | null
   created_at: string
@@ -98,7 +116,8 @@ export interface TransactionResponse {
 }
 
 export interface RecategorizeRequest {
-  category: Category
+  category_slug?: string
+  category_id?: string
   description_clean?: string | null
 }
 
@@ -107,7 +126,7 @@ export interface DashboardFilters {
   account_id?: string
   date_from?: string // "YYYY-MM-DD"
   date_to?: string   // "YYYY-MM-DD"
-  category?: Category
+  category?: string
 }
 
 export type AppView = "dashboard" | "account" | "admin"

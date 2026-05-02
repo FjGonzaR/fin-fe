@@ -1,5 +1,10 @@
+import { useState } from "react"
 import { Header } from "@/components/layout/Header"
 import { UsersTab } from "./UsersTab"
+import { FilesTab } from "./FilesTab"
+import { AccountsTab } from "./AccountsTab"
+import { CategoriesTab } from "./CategoriesTab"
+import { AdminTabBar, type AdminTab } from "./AdminTabBar"
 import type { AppView } from "@/types/api"
 
 interface AdminLayoutProps {
@@ -8,6 +13,8 @@ interface AdminLayoutProps {
 }
 
 export function AdminLayout({ currentView, onViewChange }: AdminLayoutProps) {
+  const [tab, setTab] = useState<AdminTab>("files")
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-7xl">
@@ -15,7 +22,12 @@ export function AdminLayout({ currentView, onViewChange }: AdminLayoutProps) {
 
         <main className="space-y-6 px-4 pb-10 sm:px-6">
           <h2 className="text-xl font-bold text-gray-900">Administración</h2>
-          <UsersTab />
+          <AdminTabBar activeTab={tab} onTabChange={setTab} />
+
+          {tab === "files" && <FilesTab />}
+          {tab === "accounts" && <AccountsTab />}
+          {tab === "categories" && <CategoriesTab />}
+          {tab === "users" && <UsersTab />}
         </main>
       </div>
     </div>

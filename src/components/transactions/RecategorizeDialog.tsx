@@ -16,7 +16,7 @@ import {
 import { useRecategorize } from "@/hooks/useRecategorize"
 import { getCategoryColor } from "@/lib/categoryColors"
 import { useCategories } from "@/hooks/useCategories"
-import type { Category, TransactionResponse } from "@/types/api"
+import type { TransactionResponse } from "@/types/api"
 
 interface RecategorizeDialogProps {
   transaction: TransactionResponse
@@ -25,16 +25,14 @@ interface RecategorizeDialogProps {
 }
 
 export function RecategorizeDialog({ transaction, open, onOpenChange }: RecategorizeDialogProps) {
-  const [selected, setSelected] = useState<Category | "">(
-    (transaction.category as Category | null) ?? ""
-  )
-  const { mutate, isPending, isSuccess, reset } = useRecategorize()
+  const [selected, setSelected] = useState<string>(transaction.category ?? "")
+  const { mutate, isPending, isSuccess, reset, error } = useRecategorize()
   const { data: categories = [] } = useCategories()
 
   function handleSubmit() {
     if (!selected) return
     mutate(
-      { id: transaction.id, body: { category: selected } },
+      { id: transaction.id, body: { category_slug: selected } },
       {
         onSuccess: () => {
           setTimeout(() => {
@@ -66,25 +64,26 @@ export function RecategorizeDialog({ transaction, open, onOpenChange }: Recatego
         <div className="py-2">
           <Select
             value={selected}
-            onValueChange={(v) => setSelected(v as Category)}
+            onValueChange={(v) => setSelected(v)}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Selecciona una categoría" />
             </SelectTrigger>
             <SelectContent>
               {categories.map((cat) => (
-                <SelectItem key={cat} value={cat}>
+                <SelectItem key={cat.id} value={cat.slug}>
                   <div className="flex items-center gap-2">
                     <span
                       className="inline-block h-2 w-2 rounded-full"
-                      style={{ backgroundColor: getCategoryColor(cat) }}
+                      style={{ backgroundColor: getCategoryColor(cat.slug) }}
                     />
-                    {cat}
+                    {cat.name}
                   </div>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          {error && <p className="mt-2 text-xs text-red-500">{error.message}</p>}
         </div>
 
         <DialogFooter>

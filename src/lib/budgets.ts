@@ -1,5 +1,5 @@
-import type { Category } from "@/types/api";
-export const CATEGORY_BUDGETS: Partial<Record<Category, number>> = {
+// Keys are category slugs (string) — categorías ahora son dinámicas pero presupuestos son por slug.
+export const CATEGORY_BUDGETS: Record<string, number> = {
   HOGAR: 5_500_000, // arriendo 3.2M
   RESTAURANTES: 1_750_000, // 1 almuerzo entre semana (max. 40.000) = 320_000 + 8 salidas ricas por mes (max. 60.000) = 960_000 + 1 salida a Vacu a la semana(max. 40.000) + 1 top (300.000)
   DOMICILIOS: 500_000, // 1 vez por semana (max. 50.000 c/u) = 400_000

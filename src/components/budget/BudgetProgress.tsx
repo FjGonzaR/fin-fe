@@ -3,11 +3,12 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
 import { ErrorState } from "@/components/shared/ErrorState"
 import { useByCategory } from "@/hooks/useByCategory"
 import { useKpis } from "@/hooks/useKpis"
+import { useCategories } from "@/hooks/useCategories"
 import { CATEGORY_BUDGETS } from "@/lib/budgets"
 import { getCategoryColor } from "@/lib/categoryColors"
 import { formatCop } from "@/lib/formatCop"
 import { countDays } from "@/lib/dateUtils"
-import type { DashboardFilters, Category } from "@/types/api"
+import type { DashboardFilters } from "@/types/api"
 
 interface BudgetProgressProps {
   filters: DashboardFilters
@@ -26,6 +27,8 @@ function exceededTextColor(globalNet: number): string {
 export function BudgetProgress({ filters }: BudgetProgressProps) {
   const { data, isLoading, isError } = useByCategory(filters)
   const { data: kpis } = useKpis(filters)
+  const { data: categories = [] } = useCategories()
+  const slugToName = new Map(categories.map((c) => [c.slug, c.name]))
   const globalNet = kpis?.net ?? 0
 
   if (isLoading) return <LoadingSpinner />
@@ -38,7 +41,7 @@ export function BudgetProgress({ filters }: BudgetProgressProps) {
     if (item.category) spendByCategory.set(item.category, item.total)
   }
 
-  const rows = (Object.keys(CATEGORY_BUDGETS) as Category[]).map((cat) => {
+  const rows = Object.keys(CATEGORY_BUDGETS).map((cat) => {
     const budget = (CATEGORY_BUDGETS[cat] ?? 0) * (days / 30)
     const spent = spendByCategory.get(cat) ?? 0
     const pct = budget > 0 ? (spent / budget) * 100 : 0
@@ -65,7 +68,7 @@ export function BudgetProgress({ filters }: BudgetProgressProps) {
                       className="inline-block h-2.5 w-2.5 rounded-full flex-shrink-0"
                       style={{ backgroundColor: color }}
                     />
-                    <span className="font-medium text-gray-700">{cat}</span>
+                    <span className="font-medium text-gray-700">{slugToName.get(cat) ?? cat}</span>
                   </div>
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <span className={exceeded ? `font-semibold ${exceededTextColor(globalNet)}` : ""}>

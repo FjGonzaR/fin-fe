@@ -7,18 +7,17 @@ import {
 } from "@/components/ui/select"
 import { getCategoryColor } from "@/lib/categoryColors"
 import { useCategories } from "@/hooks/useCategories"
-import type { Category } from "@/types/api"
 
 interface CategorySelectorProps {
-  value: Category | undefined
-  onChange: (category: Category | undefined) => void
+  value: string | undefined
+  onChange: (category: string | undefined) => void
 }
 
 export function CategorySelector({ value, onChange }: CategorySelectorProps) {
   const { data: categories = [] } = useCategories(true)
 
   function handleChange(next: string) {
-    onChange(next === "__all__" ? undefined : (next as Category))
+    onChange(next === "__all__" ? undefined : next)
   }
 
   return (
@@ -29,13 +28,13 @@ export function CategorySelector({ value, onChange }: CategorySelectorProps) {
       <SelectContent>
         <SelectItem value="__all__">Todas las categorías</SelectItem>
         {categories.map((cat) => (
-          <SelectItem key={cat} value={cat}>
+          <SelectItem key={cat.id} value={cat.slug}>
             <div className="flex items-center gap-2">
               <span
                 className="inline-block h-2 w-2 shrink-0 rounded-full"
-                style={{ backgroundColor: getCategoryColor(cat) }}
+                style={{ backgroundColor: getCategoryColor(cat.slug) }}
               />
-              {cat}
+              {cat.name}
             </div>
           </SelectItem>
         ))}

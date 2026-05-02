@@ -14,6 +14,7 @@ import { EmptyState } from "@/components/shared/EmptyState"
 import { ErrorState } from "@/components/shared/ErrorState"
 import { RecategorizeDialog } from "./RecategorizeDialog"
 import { useTransactions } from "@/hooks/useTransactions"
+import { useCategories } from "@/hooks/useCategories"
 import { formatCop } from "@/lib/formatCop"
 import { getCategoryColor } from "@/lib/categoryColors"
 import { PencilIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon } from "lucide-react"
@@ -27,6 +28,8 @@ interface TransactionsListProps {
 
 export function TransactionsList({ filters }: TransactionsListProps) {
   const { data, isLoading, isError } = useTransactions(filters)
+  const { data: categories = [] } = useCategories()
+  const slugToName = new Map(categories.map((c) => [c.slug, c.name]))
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState("")
   const [recategorizing, setRecategorizing] = useState<TransactionResponse | null>(null)
@@ -150,7 +153,7 @@ export function TransactionsList({ filters }: TransactionsListProps) {
                               className="text-xs font-medium text-white"
                               style={{ backgroundColor: getCategoryColor(txn.category) }}
                             >
-                              {txn.category ?? "SIN_CATEGORIZAR"}
+                              {txn.category ? (slugToName.get(txn.category) ?? txn.category) : "Sin categorizar"}
                             </Badge>
                           </TableCell>
 
