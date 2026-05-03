@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -68,16 +69,28 @@ export function CategoryFormDialog({ category, open, onOpenChange }: Props) {
       update.mutate(
         { id: category.id, body },
         {
-          onSuccess: () => onOpenChange(false),
-          onError: (err) => setError(err.message),
+          onSuccess: () => {
+            toast.success("Categoría actualizada")
+            onOpenChange(false)
+          },
+          onError: (err) => {
+            setError(err.message)
+            toast.error(err.message)
+          },
         },
       )
     } else {
       create.mutate(
         { slug: form.slug.trim(), name: form.name.trim(), description },
         {
-          onSuccess: () => onOpenChange(false),
-          onError: (err) => setError(err.message),
+          onSuccess: () => {
+            toast.success("Categoría creada")
+            onOpenChange(false)
+          },
+          onError: (err) => {
+            setError(err.message)
+            toast.error(err.message)
+          },
         },
       )
     }
@@ -95,7 +108,7 @@ export function CategoryFormDialog({ category, open, onOpenChange }: Props) {
 
         <div className="space-y-3">
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-700">Slug</label>
+            <label className="mb-1 block text-xs font-medium text-slate-700">Slug</label>
             <input
               type="text"
               value={form.slug}
@@ -104,7 +117,7 @@ export function CategoryFormDialog({ category, open, onOpenChange }: Props) {
                 setForm((f) => ({ ...f, slug: e.target.value.toUpperCase() }))
               }
               placeholder="MASCOTAS"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 font-mono text-sm outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 disabled:bg-gray-50 disabled:text-gray-400"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 font-mono text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-400"
             />
             {!isEdit && form.slug && !slugValid && (
               <p className="mt-1 text-xs text-red-500">
@@ -112,33 +125,33 @@ export function CategoryFormDialog({ category, open, onOpenChange }: Props) {
               </p>
             )}
             {slugLocked && (
-              <p className="mt-1 text-xs text-gray-400">Categoría de sistema — slug no editable</p>
+              <p className="mt-1 text-xs text-slate-400">Categoría de sistema — slug no editable</p>
             )}
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-700">Nombre</label>
+            <label className="mb-1 block text-xs font-medium text-slate-700">Nombre</label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
               placeholder="Mascotas"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-700">Descripción</label>
+            <label className="mb-1 block text-xs font-medium text-slate-700">Descripción</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
               rows={2}
-              className="w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400"
+              className="w-full resize-none rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
           {isEdit && (
-            <label className="flex items-center gap-2 text-sm text-gray-700">
+            <label className="flex items-center gap-2 text-sm text-slate-700">
               <input
                 type="checkbox"
                 checked={form.is_active}
@@ -147,7 +160,7 @@ export function CategoryFormDialog({ category, open, onOpenChange }: Props) {
               />
               Activa
               {activeLocked && (
-                <span className="text-xs text-gray-400">(sistema, no editable)</span>
+                <span className="text-xs text-slate-400">(sistema, no editable)</span>
               )}
             </label>
           )}
@@ -158,14 +171,14 @@ export function CategoryFormDialog({ category, open, onOpenChange }: Props) {
         <DialogFooter className="gap-2">
           <button
             onClick={() => onOpenChange(false)}
-            className="rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+            className="rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
           >
             Cancelar
           </button>
           <button
             onClick={handleSubmit}
             disabled={!isValid || isPending}
-            className="rounded-lg bg-gray-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isPending ? "Guardando…" : isEdit ? "Guardar" : "Crear"}
           </button>

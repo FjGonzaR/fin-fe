@@ -16,13 +16,13 @@ interface BudgetProgressProps {
 }
 
 function barColor(pct: number, globalNet: number): string {
-  if (pct >= 100) return globalNet >= 0 ? "bg-yellow-400" : "bg-red-400"
-  if (pct >= 80) return "bg-yellow-400"
-  return "bg-green-400"
+  if (pct >= 100) return globalNet >= 0 ? "bg-amber-500" : "bg-red-500"
+  if (pct >= 80) return "bg-amber-500"
+  return "bg-blue-600"
 }
 
 function exceededTextColor(globalNet: number): string {
-  return globalNet >= 0 ? "text-yellow-600" : "text-red-500"
+  return globalNet >= 0 ? "text-amber-600" : "text-red-600"
 }
 
 export function BudgetProgress({ filters }: BudgetProgressProps) {

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -35,11 +36,13 @@ export function RecategorizeDialog({ transaction, open, onOpenChange }: Recatego
       { id: transaction.id, body: { category_slug: selected } },
       {
         onSuccess: () => {
+          toast.success("Transacción recategorizada")
           setTimeout(() => {
             onOpenChange(false)
             reset()
-          }, 800)
+          }, 600)
         },
+        onError: (err) => toast.error(err.message),
       },
     )
   }
@@ -96,7 +99,7 @@ export function RecategorizeDialog({ transaction, open, onOpenChange }: Recatego
           <button
             onClick={handleSubmit}
             disabled={!selected || isPending || isSuccess}
-            className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50"
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
           >
             {isPending ? "Guardando…" : isSuccess ? "Guardado" : "Guardar"}
           </button>

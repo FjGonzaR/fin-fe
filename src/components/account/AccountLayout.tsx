@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { FileText, CreditCard } from "lucide-react"
-import { Header } from "@/components/layout/Header"
+import { AppShell } from "@/components/layout/AppShell"
 import { FilesTab } from "@/components/admin/FilesTab"
 import { AccountsTab } from "@/components/admin/AccountsTab"
 import { cn } from "@/lib/utils"
@@ -22,36 +22,27 @@ export function AccountLayout({ currentView, onViewChange }: AccountLayoutProps)
   const [activeTab, setActiveTab] = useState<AccountTab>("files")
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-7xl">
-        <Header currentView={currentView} onViewChange={onViewChange} />
-
-        <main className="space-y-6 px-4 pb-10 sm:px-6">
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold text-gray-900">Mi cuenta</h2>
-            <div className="flex w-full gap-1 rounded-xl bg-gray-100 p-1 sm:w-fit">
-              {TABS.map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  onClick={() => setActiveTab(id)}
-                  className={cn(
-                    "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-medium transition-colors sm:flex-none",
-                    activeTab === id
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700",
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {activeTab === "files" && <FilesTab />}
-          {activeTab === "accounts" && <AccountsTab />}
-        </main>
+    <AppShell currentView={currentView} onViewChange={onViewChange} title="Mi cuenta">
+      <div className="flex w-full gap-1 rounded-xl bg-slate-100 p-1 sm:w-fit">
+        {TABS.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setActiveTab(id)}
+            className={cn(
+              "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-medium transition-colors sm:flex-none",
+              activeTab === id
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-500 hover:text-slate-700",
+            )}
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+          </button>
+        ))}
       </div>
-    </div>
+
+      {activeTab === "files" && <FilesTab />}
+      {activeTab === "accounts" && <AccountsTab />}
+    </AppShell>
   )
 }

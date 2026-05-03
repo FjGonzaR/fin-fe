@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useMutation } from "@tanstack/react-query"
+import { motion, AnimatePresence } from "motion/react"
 import { Play, RotateCcw, Trash2, Eye, Loader2 } from "lucide-react"
 import { getFileUrl } from "@/api/endpoints"
 import {
@@ -33,7 +34,7 @@ const STATUS_STYLES: Record<string, string> = {
   PROCESSED: "bg-green-100 text-green-700 border-green-200",
   FAILED: "bg-red-100 text-red-700 border-red-200",
   PARSING: "bg-yellow-100 text-yellow-700 border-yellow-200",
-  UPLOADED: "bg-gray-100 text-gray-600 border-gray-200",
+  UPLOADED: "bg-slate-100 text-slate-600 border-slate-200",
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -43,7 +44,7 @@ const STATUS_LABELS: Record<string, string> = {
   UPLOADED: "Subido",
 }
 
-const FALLBACK_STYLE = "bg-gray-100 text-gray-500 border-gray-200"
+const FALLBACK_STYLE = "bg-slate-100 text-slate-500 border-slate-200"
 
 function normalizeStatus(status: string): string {
   return status?.toUpperCase() ?? "PENDING"
@@ -98,16 +99,17 @@ export function FilesTable({
       {/* ── Mobile card list (< sm) ── */}
       <div className="space-y-2 sm:hidden">
         {isLoading && Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="rounded-xl border border-gray-200 bg-white p-3 space-y-2">
+          <div key={i} className="rounded-xl border border-slate-200 bg-white p-3 space-y-2">
             <Skeleton className="h-4 w-3/4" />
             <Skeleton className="h-3 w-1/2" />
           </div>
         ))}
 
         {!isLoading && (!files || files.length === 0) && (
-          <p className="py-8 text-center text-sm text-gray-400">No hay archivos subidos aún.</p>
+          <p className="py-8 text-center text-sm text-slate-400">No hay archivos subidos aún.</p>
         )}
 
+        <AnimatePresence mode="popLayout" initial={false}>
         {files?.map((file) => {
           const isMutating = pendingFileId === file.file_id
           const status = normalizeStatus(file.status)
@@ -116,13 +118,21 @@ export function FilesTable({
           const deleteAllowed = canDelete(status) && !isMutating
 
           return (
-            <div key={file.file_id} className="rounded-xl border border-gray-200 bg-white p-3">
+            <motion.div
+              key={file.file_id}
+              layout
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.97 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="rounded-xl border border-slate-200 bg-white p-3"
+            >
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div className="min-w-0">
-                  <p className="font-mono text-xs font-medium text-gray-800 truncate" title={file.filename}>
+                  <p className="font-mono text-xs font-medium text-slate-800 truncate" title={file.filename}>
                     {file.filename}
                   </p>
-                  <p className="text-xs text-gray-500 mt-0.5">{file.account_name}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{file.account_name}</p>
                 </div>
                 <span className={`shrink-0 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[status] ?? FALLBACK_STYLE}`}>
                   {status === "PARSING" && <Loader2 className="h-3 w-3 animate-spin" />}
@@ -130,32 +140,33 @@ export function FilesTable({
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-400">{formatDate(file.uploaded_at)}</p>
+                <p className="text-xs text-slate-400">{formatDate(file.uploaded_at)}</p>
                 <div className="flex items-center gap-1">
-                  <button title="Abrir" disabled={status !== "PROCESSED" || openingFileId === file.file_id} onClick={() => { setOpeningFileId(file.file_id); fileUrlMutation.mutate(file.file_id) }} className="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed">
+                  <button title="Abrir" disabled={status !== "PROCESSED" || openingFileId === file.file_id} onClick={() => { setOpeningFileId(file.file_id); fileUrlMutation.mutate(file.file_id) }} className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed">
                     {openingFileId === file.file_id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
                   </button>
-                  <button title="Procesar ETL" disabled={!playAllowed} onClick={() => onTriggerEtl(file.file_id)} className="rounded p-1.5 text-gray-400 hover:bg-blue-50 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed">
+                  <button title="Procesar ETL" disabled={!playAllowed} onClick={() => onTriggerEtl(file.file_id)} className="rounded p-1.5 text-slate-400 hover:bg-blue-50 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed">
                     {isMutating && canPlay(status) ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
                   </button>
-                  <button title="Resetear ETL" disabled={!resetAllowed} onClick={() => setConfirmReset(file)} className="rounded p-1.5 text-gray-400 hover:bg-yellow-50 hover:text-yellow-600 disabled:opacity-30 disabled:cursor-not-allowed">
+                  <button title="Resetear ETL" disabled={!resetAllowed} onClick={() => setConfirmReset(file)} className="rounded p-1.5 text-slate-400 hover:bg-yellow-50 hover:text-yellow-600 disabled:opacity-30 disabled:cursor-not-allowed">
                     <RotateCcw className="h-4 w-4" />
                   </button>
-                  <button title="Eliminar" disabled={!deleteAllowed} onClick={() => setConfirmDelete(file)} className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 disabled:opacity-30 disabled:cursor-not-allowed">
+                  <button title="Eliminar" disabled={!deleteAllowed} onClick={() => setConfirmDelete(file)} className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 disabled:opacity-30 disabled:cursor-not-allowed">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )
         })}
+        </AnimatePresence>
       </div>
 
       {/* ── Desktop table (≥ sm) ── */}
-      <div className="hidden sm:block rounded-xl border border-gray-200 bg-white overflow-hidden">
+      <div className="hidden sm:block rounded-xl border border-slate-200 bg-white overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-50">
+            <TableRow className="bg-slate-50">
               <TableHead>Archivo</TableHead>
               <TableHead>Cuenta</TableHead>
               <TableHead>Estado</TableHead>
@@ -177,12 +188,13 @@ export function FilesTable({
 
             {!isLoading && (!files || files.length === 0) && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-sm text-gray-400 py-8">
+                <TableCell colSpan={5} className="text-center text-sm text-slate-400 py-8">
                   No hay archivos subidos aún.
                 </TableCell>
               </TableRow>
             )}
 
+            <AnimatePresence mode="popLayout" initial={false}>
             {files?.map((file) => {
               const isMutating = pendingFileId === file.file_id
               const status = normalizeStatus(file.status)
@@ -191,41 +203,49 @@ export function FilesTable({
               const deleteAllowed = canDelete(status) && !isMutating
 
               return (
-                <TableRow key={file.file_id} className="hover:bg-gray-50">
+                <motion.tr
+                  key={file.file_id}
+                  layout
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                  className="border-b border-slate-100 hover:bg-slate-50"
+                >
                   <TableCell>
-                    <span className="font-mono text-xs text-gray-800" title={file.filename}>
+                    <span className="font-mono text-xs text-slate-800" title={file.filename}>
                       {truncate(file.filename, 32)}
                     </span>
                   </TableCell>
-                  <TableCell className="text-sm text-gray-600">{file.account_name}</TableCell>
+                  <TableCell className="text-sm text-slate-600">{file.account_name}</TableCell>
                   <TableCell>
                     <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[status] ?? FALLBACK_STYLE}`}>
                       {status === "PARSING" && <Loader2 className="h-3 w-3 animate-spin" />}
                       {STATUS_LABELS[status] ?? status}
                     </span>
                   </TableCell>
-                  <TableCell className="text-xs text-gray-500">
+                  <TableCell className="text-xs text-slate-500">
                     {formatDate(file.uploaded_at)}
                   </TableCell>
                   <TableCell className="text-right pr-4">
                     <div className="flex items-center justify-end gap-1">
-                      <button title={status !== "PROCESSED" ? "Solo disponible para archivos procesados" : "Abrir archivo"} disabled={status !== "PROCESSED" || openingFileId === file.file_id} onClick={() => { setOpeningFileId(file.file_id); fileUrlMutation.mutate(file.file_id) }} className="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed">
+                      <button title={status !== "PROCESSED" ? "Solo disponible para archivos procesados" : "Abrir archivo"} disabled={status !== "PROCESSED" || openingFileId === file.file_id} onClick={() => { setOpeningFileId(file.file_id); fileUrlMutation.mutate(file.file_id) }} className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed">
                         {openingFileId === file.file_id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
                       </button>
-                      <button title={status === "PROCESSED" ? "Ya procesado — usa Resetear para reprocesar" : status === "PARSING" ? "Procesando…" : status === "FAILED" ? "Reintentar ETL" : "Procesar ETL"} disabled={!playAllowed} onClick={() => onTriggerEtl(file.file_id)} className="rounded p-1.5 text-gray-400 hover:bg-blue-50 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed">
+                      <button title={status === "PROCESSED" ? "Ya procesado — usa Resetear para reprocesar" : status === "PARSING" ? "Procesando…" : status === "FAILED" ? "Reintentar ETL" : "Procesar ETL"} disabled={!playAllowed} onClick={() => onTriggerEtl(file.file_id)} className="rounded p-1.5 text-slate-400 hover:bg-blue-50 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed">
                         {isMutating && canPlay(status) ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
                       </button>
-                      <button title={!resetAllowed && status !== "PROCESSING" ? "Solo disponible para archivos procesados" : "Resetear ETL y eliminar transacciones"} disabled={!resetAllowed} onClick={() => setConfirmReset(file)} className="rounded p-1.5 text-gray-400 hover:bg-yellow-50 hover:text-yellow-600 disabled:opacity-30 disabled:cursor-not-allowed">
+                      <button title={!resetAllowed && status !== "PROCESSING" ? "Solo disponible para archivos procesados" : "Resetear ETL y eliminar transacciones"} disabled={!resetAllowed} onClick={() => setConfirmReset(file)} className="rounded p-1.5 text-slate-400 hover:bg-yellow-50 hover:text-yellow-600 disabled:opacity-30 disabled:cursor-not-allowed">
                         <RotateCcw className="h-4 w-4" />
                       </button>
-                      <button title={status === "PROCESSING" ? "No se puede eliminar mientras se procesa" : "Eliminar archivo"} disabled={!deleteAllowed} onClick={() => setConfirmDelete(file)} className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 disabled:opacity-30 disabled:cursor-not-allowed">
+                      <button title={status === "PROCESSING" ? "No se puede eliminar mientras se procesa" : "Eliminar archivo"} disabled={!deleteAllowed} onClick={() => setConfirmDelete(file)} className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 disabled:opacity-30 disabled:cursor-not-allowed">
                         <Trash2 className="h-4 w-4" />
                       </button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                    </div>                  </TableCell>
+                </motion.tr>
               )
             })}
+            </AnimatePresence>
           </TableBody>
         </Table>
       </div>
@@ -235,7 +255,7 @@ export function FilesTable({
           <DialogHeader>
             <DialogTitle>¿Resetear ETL?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-600">
             Se eliminarán todas las transacciones de{" "}
             <span className="font-medium">{confirmReset?.filename}</span> y el archivo
             volverá a estado PENDING.
@@ -243,7 +263,7 @@ export function FilesTable({
           <DialogFooter className="gap-2">
             <button
               onClick={() => setConfirmReset(null)}
-              className="rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+              className="rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
             >
               Cancelar
             </button>
@@ -265,14 +285,14 @@ export function FilesTable({
           <DialogHeader>
             <DialogTitle>¿Eliminar archivo?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-600">
             Se eliminará <span className="font-medium">{confirmDelete?.filename}</span> del
             almacenamiento. Si tiene transacciones asociadas, primero debes resetear el ETL.
           </p>
           <DialogFooter className="gap-2">
             <button
               onClick={() => setConfirmDelete(null)}
-              className="rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+              className="rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
             >
               Cancelar
             </button>

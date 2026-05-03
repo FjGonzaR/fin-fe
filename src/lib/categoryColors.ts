@@ -12,7 +12,7 @@ export const CATEGORY_COLORS: Record<string, string> = {
   REGALOS: "#e11d48",
   EDUCACION: "#8b5cf6",
   TRABAJO: "#64748b",
-  COBRO_BANCARIO: "#ef4444",
+  COBRO_BANCARIO: "#7C3AED",
   PAGO: "#22c55e",
   PLATAFORMAS: "#06b6d4",
   INGRESO: "#16a34a",

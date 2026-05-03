@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Plus, Trash2, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -38,15 +39,27 @@ export function CategoryKeywordsDialog({ category, onClose }: Props) {
     create.mutate(
       { keyword: input.trim() },
       {
-        onSuccess: () => setInput(""),
-        onError: (err) => setError(err.message),
+        onSuccess: () => {
+          toast.success("Keyword añadida")
+          setInput("")
+        },
+        onError: (err) => {
+          setError(err.message)
+          toast.error(err.message)
+        },
       },
     )
   }
 
   function handleDelete(kid: string) {
     setError(null)
-    del.mutate(kid, { onError: (err) => setError(err.message) })
+    del.mutate(kid, {
+      onSuccess: () => toast.success("Keyword eliminada"),
+      onError: (err) => {
+        setError(err.message)
+        toast.error(err.message)
+      },
+    })
   }
 
   return (
@@ -67,12 +80,12 @@ export function CategoryKeywordsDialog({ category, onClose }: Props) {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") handleAdd() }}
               placeholder="Nueva keyword manual…"
-              className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400"
+              className="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
             <button
               onClick={handleAdd}
               disabled={!input.trim() || create.isPending}
-              className="flex items-center gap-1.5 rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
             >
               {create.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
               Agregar
@@ -123,29 +136,29 @@ interface ListProps {
 function KeywordList({ title, items, showWeight, onDelete, pendingDelete }: ListProps) {
   return (
     <div>
-      <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-        {title} <span className="text-gray-400">({items.length})</span>
+      <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+        {title} <span className="text-slate-400">({items.length})</span>
       </h4>
       {items.length === 0 ? (
-        <p className="text-xs text-gray-400">Sin keywords</p>
+        <p className="text-xs text-slate-400">Sin keywords</p>
       ) : (
-        <ul className="max-h-64 space-y-1 overflow-y-auto rounded-lg border border-gray-100 bg-gray-50 p-2">
+        <ul className="max-h-64 space-y-1 overflow-y-auto rounded-lg border border-slate-100 bg-slate-50 p-2">
           {items.map((k) => (
             <li
               key={k.id}
               className="flex items-center justify-between gap-2 rounded bg-white px-2 py-1.5 text-sm"
             >
-              <span className="truncate font-mono text-xs text-gray-700">{k.keyword}</span>
+              <span className="truncate font-mono text-xs text-slate-700">{k.keyword}</span>
               <div className="flex items-center gap-2">
                 {showWeight && (
-                  <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600">
+                  <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600">
                     {k.weight}
                   </span>
                 )}
                 <button
                   onClick={() => onDelete(k.id)}
                   disabled={pendingDelete === k.id}
-                  className="rounded p-1 text-gray-300 hover:bg-red-50 hover:text-red-500 disabled:opacity-40"
+                  className="rounded p-1 text-slate-300 hover:bg-red-50 hover:text-red-500 disabled:opacity-40"
                   title="Eliminar"
                 >
                   <Trash2 className="h-3.5 w-3.5" />

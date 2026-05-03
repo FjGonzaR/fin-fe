@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -81,14 +82,26 @@ export function AccountFormDialog({ account, open, onOpenChange }: AccountFormDi
       updateAccount.mutate(
         { id: account.id, body },
         {
-          onSuccess: () => onOpenChange(false),
-          onError: (err) => setError(err.message),
+          onSuccess: () => {
+            toast.success("Cuenta actualizada")
+            onOpenChange(false)
+          },
+          onError: (err) => {
+            setError(err.message)
+            toast.error(err.message)
+          },
         },
       )
     } else {
       createAccount.mutate(body, {
-        onSuccess: () => onOpenChange(false),
-        onError: (err) => setError(err.message),
+        onSuccess: () => {
+          toast.success("Cuenta creada")
+          onOpenChange(false)
+        },
+        onError: (err) => {
+          setError(err.message)
+          toast.error(err.message)
+        },
       })
     }
   }
@@ -102,7 +115,7 @@ export function AccountFormDialog({ account, open, onOpenChange }: AccountFormDi
 
         <div className="space-y-3">
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-700">
+            <label className="mb-1 block text-xs font-medium text-slate-700">
               Nombre de la cuenta
             </label>
             <input
@@ -110,12 +123,12 @@ export function AccountFormDialog({ account, open, onOpenChange }: AccountFormDi
               value={form.account_name}
               onChange={(e) => setForm((f) => ({ ...f, account_name: e.target.value }))}
               placeholder="Ej: Cuenta de ahorros"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-700">Banco</label>
+            <label className="mb-1 block text-xs font-medium text-slate-700">Banco</label>
             <Select
               value={form.bank_name}
               onValueChange={(v) => setForm((f) => ({ ...f, bank_name: v as BankEnum }))}
@@ -134,7 +147,7 @@ export function AccountFormDialog({ account, open, onOpenChange }: AccountFormDi
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-700">Propietario</label>
+            <label className="mb-1 block text-xs font-medium text-slate-700">Propietario</label>
             <Select
               value={form.owner}
               onValueChange={(v) => setForm((f) => ({ ...f, owner: v as OwnerEnum }))}
@@ -153,7 +166,7 @@ export function AccountFormDialog({ account, open, onOpenChange }: AccountFormDi
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-700">Tipo de cuenta</label>
+            <label className="mb-1 block text-xs font-medium text-slate-700">Tipo de cuenta</label>
             <Select
               value={form.account_type}
               onValueChange={(v) => setForm((f) => ({ ...f, account_type: v as AccountTypeEnum }))}
@@ -177,14 +190,14 @@ export function AccountFormDialog({ account, open, onOpenChange }: AccountFormDi
         <DialogFooter className="gap-2">
           <button
             onClick={() => onOpenChange(false)}
-            className="rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+            className="rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
           >
             Cancelar
           </button>
           <button
             onClick={handleSubmit}
             disabled={!isValid || isPending}
-            className="rounded-lg bg-gray-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isPending ? "Guardando…" : isEdit ? "Guardar cambios" : "Crear cuenta"}
           </button>

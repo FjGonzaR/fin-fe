@@ -44,17 +44,17 @@ export function FilePreviewDialog({
 
           {data && (
             <>
-              <p className="text-xs text-gray-400 mb-3">
+              <p className="text-xs text-slate-400 mb-3">
                 Mostrando {data.rows.length} de {data.total_rows} filas
               </p>
-              <div className="overflow-x-auto rounded-lg border border-gray-200">
+              <div className="overflow-x-auto rounded-lg border border-slate-200">
                 <table className="w-full text-xs">
-                  <thead className="bg-gray-50 sticky top-0">
+                  <thead className="bg-slate-50 sticky top-0">
                     <tr>
                       {data.columns.map((col) => (
                         <th
                           key={col}
-                          className="px-3 py-2 text-left font-medium text-gray-600 whitespace-nowrap border-b border-gray-200"
+                          className="px-3 py-2 text-left font-medium text-slate-600 whitespace-nowrap border-b border-slate-200"
                         >
                           {col}
                         </th>
@@ -65,12 +65,12 @@ export function FilePreviewDialog({
                     {data.rows.map((row, i) => (
                       <tr
                         key={i}
-                        className="border-b border-gray-100 last:border-0 hover:bg-gray-50"
+                        className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
                       >
                         {data.columns.map((col) => (
                           <td
                             key={col}
-                            className="px-3 py-1.5 text-gray-700 whitespace-nowrap"
+                            className="px-3 py-1.5 text-slate-700 whitespace-nowrap"
                           >
                             {row[col] !== null && row[col] !== undefined
                               ? String(row[col])

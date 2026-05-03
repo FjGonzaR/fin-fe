@@ -35,7 +35,7 @@ export function OwnerSelector({ value, onChange }: OwnerSelectorProps) {
         <ToggleGroupItem
           key={opt.value}
           value={opt.value}
-          className="rounded-full px-4 text-sm font-medium data-[state=on]:bg-gray-900 data-[state=on]:text-white"
+          className="rounded-full px-4 text-sm font-medium transition-colors data-[state=on]:bg-blue-600 data-[state=on]:text-white data-[state=on]:shadow-sm"
         >
           {opt.label}
         </ToggleGroupItem>

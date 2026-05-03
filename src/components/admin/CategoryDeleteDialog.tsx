@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -48,13 +49,17 @@ export function CategoryDeleteDialog({ category, allCategories, onClose }: Props
     del.mutate(
       { id: category.id, reassignTo: needsReassign ? reassignTo : undefined },
       {
-        onSuccess: () => onClose(),
+        onSuccess: () => {
+          toast.success("Categoría eliminada")
+          onClose()
+        },
         onError: (err) => {
           const msg = err.message
           if (/reassign/i.test(msg) || /transac/i.test(msg)) {
             setNeedsReassign(true)
           }
           setError(msg)
+          toast.error(msg)
         },
       },
     )
@@ -68,13 +73,13 @@ export function CategoryDeleteDialog({ category, allCategories, onClose }: Props
         </DialogHeader>
 
         {isSystem ? (
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-600">
             <span className="font-medium">{category.name}</span> es una categoría del sistema y no
             puede ser eliminada.
           </p>
         ) : (
           <>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-slate-600">
               Se eliminará <span className="font-medium">{category.name}</span>.
               {needsReassign &&
                 " Tiene transacciones asociadas — escogé una categoría destino para reasignarlas."}
@@ -82,7 +87,7 @@ export function CategoryDeleteDialog({ category, allCategories, onClose }: Props
 
             {needsReassign && (
               <div>
-                <label className="mb-1 block text-xs font-medium text-gray-700">
+                <label className="mb-1 block text-xs font-medium text-slate-700">
                   Reasignar transacciones a
                 </label>
                 <Select value={reassignTo} onValueChange={setReassignTo}>
@@ -107,7 +112,7 @@ export function CategoryDeleteDialog({ category, allCategories, onClose }: Props
         <DialogFooter className="gap-2">
           <button
             onClick={onClose}
-            className="rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+            className="rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
           >
             Cancelar
           </button>

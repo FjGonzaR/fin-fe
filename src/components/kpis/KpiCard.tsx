@@ -6,31 +6,32 @@ interface KpiCardProps {
   title: string
   value: string
   subtitle?: string
-  valueColor?: "default" | "green" | "red"
+  tone?: "default" | "success" | "danger"
   isLoading?: boolean
 }
 
-export function KpiCard({ title, value, subtitle, valueColor = "default", isLoading }: KpiCardProps) {
+export function KpiCard({ title, value, subtitle, tone = "default", isLoading }: KpiCardProps) {
   return (
-    <Card className="rounded-2xl shadow-sm">
-      <CardContent className="p-6">
-        <p className="text-sm font-medium text-gray-500">{title}</p>
+    <Card className="rounded-2xl border-slate-200 shadow-sm">
+      <CardContent className="flex flex-col gap-2 p-6">
+        <span className="text-sm font-medium text-slate-600">{title}</span>
         {isLoading ? (
-          <Skeleton className="mt-2 h-8 w-3/4" />
+          <Skeleton className="h-8 w-3/4" />
         ) : (
-          <p
-            className={cn("mt-1 text-sm font-bold tracking-tight sm:text-base lg:text-xl", {
-              "text-gray-900": valueColor === "default",
-              "text-green-600": valueColor === "green",
-              "text-red-500": valueColor === "red",
-            })}
+          <span
+            className={cn(
+              "text-2xl font-bold leading-tight tracking-tight tabular-nums lg:text-3xl",
+              {
+                "text-slate-900": tone === "default",
+                "text-emerald-600": tone === "success",
+                "text-red-500": tone === "danger",
+              },
+            )}
           >
             {value}
-          </p>
+          </span>
         )}
-        {subtitle && (
-          <p className="mt-1 text-xs text-gray-400">{subtitle}</p>
-        )}
+        {subtitle && <span className="text-xs text-slate-400">{subtitle}</span>}
       </CardContent>
     </Card>
   )

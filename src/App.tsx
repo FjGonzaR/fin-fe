@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { Toaster } from "sonner"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { AccountLayout } from "@/components/account/AccountLayout"
 import { AdminLayout } from "@/components/admin/AdminLayout"
@@ -49,6 +50,13 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <AppContent />
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+          duration={3000}
+          toastOptions={{ className: "rounded-xl" }}
+        />
       </AuthProvider>
     </QueryClientProvider>
   )

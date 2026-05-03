@@ -1,4 +1,4 @@
-import { Header } from "./Header"
+import { AppShell } from "./AppShell"
 import { FilterBar } from "@/components/filters/FilterBar"
 import { KpiGrid } from "@/components/kpis/KpiGrid"
 import { HistogramChart } from "@/components/charts/HistogramChart"
@@ -16,24 +16,15 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ filters, onFiltersChange, currentView, onViewChange }: DashboardLayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-7xl">
-        <Header currentView={currentView} onViewChange={onViewChange} />
-
-        <main className="space-y-6 px-6 pb-10">
-          <FilterBar filters={filters} onFiltersChange={onFiltersChange} />
-          <KpiGrid filters={filters} />
-
-          <HistogramChart filters={filters} />
-
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <CategoryDonut filters={filters} />
-            <BudgetProgress filters={filters} />
-          </div>
-
-          <TransactionsList filters={filters} />
-        </main>
+    <AppShell currentView={currentView} onViewChange={onViewChange} title="Dashboard">
+      <FilterBar filters={filters} onFiltersChange={onFiltersChange} />
+      <KpiGrid filters={filters} />
+      <HistogramChart filters={filters} />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <CategoryDonut filters={filters} />
+        <BudgetProgress filters={filters} />
       </div>
-    </div>
+      <TransactionsList filters={filters} />
+    </AppShell>
   )
 }

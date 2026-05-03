@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { toast } from "sonner"
 import { RefreshCw } from "lucide-react"
 import { useFiles } from "@/hooks/useFiles"
 import { useTriggerEtl } from "@/hooks/useTriggerEtl"
@@ -16,17 +17,29 @@ export function FilesTab() {
 
   function handleTriggerEtl(fileId: string) {
     setPendingFileId(fileId)
-    triggerEtl.mutate(fileId, { onSettled: () => setPendingFileId(null) })
+    triggerEtl.mutate(fileId, {
+      onSuccess: (result) => toast.success(`Procesado: ${result.inserted_transactions} transacciones nuevas`),
+      onError: (err) => toast.error(err.message),
+      onSettled: () => setPendingFileId(null),
+    })
   }
 
   function handleResetEtl(fileId: string) {
     setPendingFileId(fileId)
-    resetEtl.mutate(fileId, { onSettled: () => setPendingFileId(null) })
+    resetEtl.mutate(fileId, {
+      onSuccess: () => toast.success("ETL reseteado"),
+      onError: (err) => toast.error(err.message),
+      onSettled: () => setPendingFileId(null),
+    })
   }
 
   function handleDeleteFile(fileId: string) {
     setPendingFileId(fileId)
-    deleteFile.mutate(fileId, { onSettled: () => setPendingFileId(null) })
+    deleteFile.mutate(fileId, {
+      onSuccess: () => toast.success("Archivo eliminado"),
+      onError: (err) => toast.error(err.message),
+      onSettled: () => setPendingFileId(null),
+    })
   }
 
   return (
@@ -35,10 +48,10 @@ export function FilesTab() {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-800">Archivos Subidos</h3>
+          <h3 className="text-sm font-semibold text-slate-800">Archivos Subidos</h3>
           <button
             onClick={() => void refetch()}
-            className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+            className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-slate-500 hover:bg-slate-100 hover:text-slate-700"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             Actualizar

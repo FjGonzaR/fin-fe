@@ -4,12 +4,23 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
 import { ErrorState } from "@/components/shared/ErrorState"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { useByCategory } from "@/hooks/useByCategory"
+import { useCategories } from "@/hooks/useCategories"
 import { formatCop } from "@/lib/formatCop"
 import { getCategoryColor } from "@/lib/categoryColors"
 import type { DashboardFilters } from "@/types/api"
 
 const RADIAN = Math.PI / 180
-const LEGEND_THRESHOLD = 5 // show in legend if percentage >= this value
+const LEGEND_THRESHOLD = 5
+
+const TOOLTIP_DARK = {
+  background: "#0F172A",
+  border: "none",
+  borderRadius: 8,
+  color: "#fff",
+  fontSize: 12,
+  padding: "6px 10px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
+} as const
 
 function InsideLabel({ cx, cy, midAngle, innerRadius, outerRadius, percent }: PieLabelRenderProps) {
   const pct = Number(percent ?? 0) * 100
@@ -32,9 +43,12 @@ interface CategoryDonutProps {
 
 export function CategoryDonut({ filters }: CategoryDonutProps) {
   const { data, isLoading, isError } = useByCategory(filters)
+  const { data: categories = [] } = useCategories()
+  const slugToName = new Map(categories.map((c) => [c.slug, c.name]))
 
   const chartData = (data ?? []).map((item) => ({
-    name: item.category ?? "SIN_CATEGORIZAR",
+    slug: item.category ?? "SIN_CATEGORIZAR",
+    name: item.category ? (slugToName.get(item.category) ?? item.category) : "Sin categorizar",
     value: item.total,
     percentage: item.percentage,
     count: item.count,
@@ -44,9 +58,9 @@ export function CategoryDonut({ filters }: CategoryDonutProps) {
   const hiddenCount = chartData.length - legendItems.length
 
   return (
-    <Card className="rounded-2xl shadow-sm">
+    <Card className="rounded-2xl border-slate-200 shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold text-gray-800">
+        <CardTitle className="text-lg font-semibold text-slate-900">
           Gastos por Categoría
         </CardTitle>
       </CardHeader>
@@ -71,7 +85,7 @@ export function CategoryDonut({ filters }: CategoryDonutProps) {
                   label={InsideLabel}
                 >
                   {chartData.map((entry) => (
-                    <Cell key={entry.name} fill={getCategoryColor(entry.name)} />
+                    <Cell key={entry.slug} fill={getCategoryColor(entry.slug)} />
                   ))}
                 </Pie>
                 <Tooltip
@@ -82,23 +96,25 @@ export function CategoryDonut({ filters }: CategoryDonutProps) {
                       payload?.name ?? "",
                     ]
                   }}
-                  contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}
+                  contentStyle={TOOLTIP_DARK}
+                  itemStyle={{ color: "#fff" }}
+                  labelStyle={{ color: "#94A3B8", fontSize: 11, marginBottom: 2 }}
                 />
               </PieChart>
             </ResponsiveContainer>
 
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
               {legendItems.map((item) => (
-                <div key={item.name} className="flex items-center gap-1.5">
+                <div key={item.slug} className="flex items-center gap-1.5">
                   <span
-                    className="inline-block h-2 w-2 shrink-0 rounded-full"
-                    style={{ backgroundColor: getCategoryColor(item.name) }}
+                    className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: getCategoryColor(item.slug) }}
                   />
-                  <span className="text-xs text-gray-600">{item.name}</span>
+                  <span className="text-xs text-slate-600">{item.name}</span>
                 </div>
               ))}
               {hiddenCount > 0 && (
-                <span className="text-xs text-gray-400">+{hiddenCount} más (ver al pasar)</span>
+                <span className="text-xs text-slate-400">+{hiddenCount} más (ver al pasar)</span>
               )}
             </div>
           </>

@@ -16,18 +16,16 @@ export function KpiGrid({ filters }: KpiGridProps) {
   const net = data?.net ?? 0
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-5 sm:grid-cols-4">
       <KpiCard
         title="Ingresos"
         value={data ? formatCop(data.total_ingresos) : "—"}
         isLoading={isLoading}
-        valueColor="green"
       />
       <KpiCard
         title="Gastos"
         value={data ? formatCop(data.total_gastos) : "—"}
         isLoading={isLoading}
-        valueColor="red"
       />
       <KpiCard
         title="Pagos Tarjeta"
@@ -43,7 +41,7 @@ export function KpiGrid({ filters }: KpiGridProps) {
         title="Balance Neto"
         value={data ? formatCop(net) : "—"}
         isLoading={isLoading}
-        valueColor={net >= 0 ? "green" : "red"}
+        tone={data ? (net >= 0 ? "success" : "danger") : "default"}
       />
       <KpiCard
         title="Gasto Promedio/Día"

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Header } from "@/components/layout/Header"
+import { AppShell } from "@/components/layout/AppShell"
 import { UsersTab } from "./UsersTab"
 import { FilesTab } from "./FilesTab"
 import { AccountsTab } from "./AccountsTab"
@@ -16,20 +16,13 @@ export function AdminLayout({ currentView, onViewChange }: AdminLayoutProps) {
   const [tab, setTab] = useState<AdminTab>("files")
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-7xl">
-        <Header currentView={currentView} onViewChange={onViewChange} />
+    <AppShell currentView={currentView} onViewChange={onViewChange} title="Administración">
+      <AdminTabBar activeTab={tab} onTabChange={setTab} />
 
-        <main className="space-y-6 px-4 pb-10 sm:px-6">
-          <h2 className="text-xl font-bold text-gray-900">Administración</h2>
-          <AdminTabBar activeTab={tab} onTabChange={setTab} />
-
-          {tab === "files" && <FilesTab />}
-          {tab === "accounts" && <AccountsTab />}
-          {tab === "categories" && <CategoriesTab />}
-          {tab === "users" && <UsersTab />}
-        </main>
-      </div>
-    </div>
+      {tab === "files" && <FilesTab />}
+      {tab === "accounts" && <AccountsTab />}
+      {tab === "categories" && <CategoriesTab />}
+      {tab === "users" && <UsersTab />}
+    </AppShell>
   )
 }

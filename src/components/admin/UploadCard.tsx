@@ -1,4 +1,5 @@
 import { useRef, useState } from "react"
+import { toast } from "sonner"
 import { UploadCloud, FileText, Play, Loader2, CheckCircle2, XCircle, RotateCcw, Lock } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import {
@@ -67,12 +68,14 @@ export function UploadCard() {
       { file, accountId, password: password || undefined },
       {
         onSuccess: (data) => {
+          toast.success("Archivo subido")
           setStep({ id: "uploaded", data })
           setFile(null)
           setAccountId("")
           if (inputRef.current) inputRef.current.value = ""
         },
         onError: (err) => {
+          toast.error(err.message)
           setStep({ id: "error", filename: file.name, message: err.message, fileId: "" })
         },
       },
@@ -90,9 +93,11 @@ export function UploadCard() {
     setStep({ id: "processing", data: uploadData })
     etlMutation.mutate(fileId, {
       onSuccess: (result) => {
+        toast.success(`Procesado: ${result.inserted_transactions} transacciones nuevas`)
         setStep({ id: "done", filename: uploadData.original_filename, result })
       },
       onError: (err) => {
+        toast.error(err.message)
         setStep({
           id: "error",
           filename: uploadData.original_filename,
@@ -106,8 +111,14 @@ export function UploadCard() {
   function handleRetryEtl(fileId: string, filename: string) {
     setStep({ id: "processing", data: { id: fileId, original_filename: filename, parse_status: "", file_hash: "", uploaded_at: "" } })
     etlMutation.mutate(fileId, {
-      onSuccess: (result) => setStep({ id: "done", filename, result }),
-      onError: (err) => setStep({ id: "error", filename, message: err.message, fileId }),
+      onSuccess: (result) => {
+        toast.success(`Procesado: ${result.inserted_transactions} transacciones nuevas`)
+        setStep({ id: "done", filename, result })
+      },
+      onError: (err) => {
+        toast.error(err.message)
+        setStep({ id: "error", filename, message: err.message, fileId })
+      },
     })
   }
 
@@ -115,7 +126,7 @@ export function UploadCard() {
 
   return (
     <Card className="p-5">
-      <h3 className="mb-4 text-sm font-semibold text-gray-800">Subir Archivo</h3>
+      <h3 className="mb-4 text-sm font-semibold text-slate-800">Subir Archivo</h3>
 
       {/* ── IDLE / UPLOADING ── */}
       {(step.id === "idle" || step.id === "uploading") && (
@@ -128,27 +139,27 @@ export function UploadCard() {
             className={cn(
               "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed py-8 transition-colors",
               step.id === "uploading"
-                ? "border-gray-300 bg-gray-50 cursor-default"
+                ? "border-slate-300 bg-slate-50 cursor-default"
                 : isDragging
-                  ? "border-gray-400 bg-gray-100"
-                  : "border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-gray-100",
+                  ? "border-slate-400 bg-slate-100"
+                  : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100",
             )}
           >
             {step.id === "uploading" ? (
               <>
-                <Loader2 className="h-8 w-8 text-gray-400 animate-spin" />
-                <p className="text-sm text-gray-500">Subiendo archivo…</p>
+                <Loader2 className="h-8 w-8 text-slate-400 animate-spin" />
+                <p className="text-sm text-slate-500">Subiendo archivo…</p>
               </>
             ) : file ? (
               <>
-                <FileText className="h-8 w-8 text-gray-400" />
-                <p className="text-sm font-medium text-gray-700">{file.name}</p>
-                <p className="text-xs text-gray-400">{(file.size / 1024).toFixed(1)} KB</p>
+                <FileText className="h-8 w-8 text-slate-400" />
+                <p className="text-sm font-medium text-slate-700">{file.name}</p>
+                <p className="text-xs text-slate-400">{(file.size / 1024).toFixed(1)} KB</p>
               </>
             ) : (
               <>
-                <UploadCloud className="h-8 w-8 text-gray-300" />
-                <p className="text-sm text-gray-500">
+                <UploadCloud className="h-8 w-8 text-slate-300" />
+                <p className="text-sm text-slate-500">
                   Arrastra un archivo <span className="font-medium">.xlsx</span> o{" "}
                   <span className="font-medium">.pdf</span>, o haz clic aquí
                 </p>
@@ -179,21 +190,21 @@ export function UploadCard() {
             </Select>
 
             <div className="relative">
-              <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
+              <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={step.id === "uploading"}
                 placeholder="Contraseña (opcional)"
-                className="w-full rounded-lg border border-gray-200 bg-white pl-8 pr-3 py-2 text-sm text-gray-700 placeholder:text-gray-400 outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 disabled:opacity-50 sm:w-44"
+                className="w-full rounded-xl border border-slate-200 bg-white pl-8 pr-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:opacity-50 sm:w-44"
               />
             </div>
 
             <button
               onClick={handleUpload}
               disabled={!canUpload}
-              className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed sm:w-auto"
+              className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed sm:w-auto"
             >
               {step.id === "uploading" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -217,22 +228,22 @@ export function UploadCard() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 space-y-3">
-            <p className="text-xs text-gray-500">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 space-y-3">
+            <p className="text-xs text-slate-500">
               El archivo está listo para ser procesado. El ETL parseará las transacciones y las
               importará a la base de datos.
             </p>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => handleTriggerEtl(step.data)}
-                className="flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+                className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
               >
                 <Play className="h-4 w-4" />
                 Procesar ETL
               </button>
               <button
                 onClick={resetToIdle}
-                className="rounded-lg px-3 py-2 text-sm text-gray-500 hover:bg-gray-200"
+                className="rounded-lg px-3 py-2 text-sm text-slate-500 hover:bg-slate-200"
               >
                 Cancelar
               </button>
@@ -268,23 +279,23 @@ export function UploadCard() {
           </div>
 
           <div className="grid grid-cols-3 gap-2">
-            <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-center">
-              <p className="text-lg font-bold text-gray-900">{step.result.parsed_rows}</p>
-              <p className="text-xs text-gray-500">Filas leídas</p>
+            <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-center">
+              <p className="text-lg font-bold text-slate-900">{step.result.parsed_rows}</p>
+              <p className="text-xs text-slate-500">Filas leídas</p>
             </div>
-            <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-center">
+            <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-center">
               <p className="text-lg font-bold text-green-700">{step.result.inserted_transactions}</p>
-              <p className="text-xs text-gray-500">Transacciones</p>
+              <p className="text-xs text-slate-500">Transacciones</p>
             </div>
-            <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-center">
-              <p className="text-lg font-bold text-gray-400">{step.result.duplicates_skipped}</p>
-              <p className="text-xs text-gray-500">Duplicados</p>
+            <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-center">
+              <p className="text-lg font-bold text-slate-400">{step.result.duplicates_skipped}</p>
+              <p className="text-xs text-slate-500">Duplicados</p>
             </div>
           </div>
 
           <button
             onClick={resetToIdle}
-            className="w-full rounded-lg border border-gray-200 py-2 text-sm text-gray-600 hover:bg-gray-50"
+            className="w-full rounded-lg border border-slate-200 py-2 text-sm text-slate-600 hover:bg-slate-50"
           >
             Subir otro archivo
           </button>
@@ -315,7 +326,7 @@ export function UploadCard() {
             )}
             <button
               onClick={resetToIdle}
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
             >
               Subir otro archivo
             </button>

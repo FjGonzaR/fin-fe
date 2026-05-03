@@ -1,12 +1,5 @@
 import { useState } from "react"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { motion, AnimatePresence } from "motion/react"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,6 +10,7 @@ import { useTransactions } from "@/hooks/useTransactions"
 import { useCategories } from "@/hooks/useCategories"
 import { formatCop } from "@/lib/formatCop"
 import { getCategoryColor } from "@/lib/categoryColors"
+import { getCategoryIcon } from "@/lib/categoryIcons"
 import { PencilIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon } from "lucide-react"
 import type { DashboardFilters, TransactionResponse } from "@/types/api"
 
@@ -24,6 +18,14 @@ const PAGE_SIZE = 20
 
 interface TransactionsListProps {
   filters: DashboardFilters
+}
+
+function hexToRgba(hex: string, alpha: number): string {
+  const m = hex.replace("#", "")
+  const r = parseInt(m.slice(0, 2), 16)
+  const g = parseInt(m.slice(2, 4), 16)
+  const b = parseInt(m.slice(4, 6), 16)
+  return `rgba(${r},${g},${b},${alpha})`
 }
 
 export function TransactionsList({ filters }: TransactionsListProps) {
@@ -61,26 +63,26 @@ export function TransactionsList({ filters }: TransactionsListProps) {
 
   return (
     <>
-      <Card className="rounded-2xl shadow-sm">
-        <CardHeader className="space-y-3 pb-2">
+      <Card className="rounded-2xl border-slate-200 shadow-sm">
+        <CardHeader className="space-y-3 pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-semibold text-gray-800">
+            <CardTitle className="text-lg font-semibold text-slate-900">
               Transacciones
             </CardTitle>
             {!isLoading && total > 0 && (
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-slate-400">
                 {from}–{to} de {total}
               </span>
             )}
           </div>
           <div className="relative">
-            <SearchIcon className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+            <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               value={search}
               onChange={(e) => handleSearch(e.target.value)}
               placeholder="Buscar por descripción, categoría, banco…"
-              className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-8 pr-4 text-sm text-gray-700 placeholder:text-gray-400 focus:border-gray-400 focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-4 text-sm text-slate-700 placeholder:text-slate-400 transition-colors focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100"
             />
           </div>
         </CardHeader>
@@ -93,117 +95,137 @@ export function TransactionsList({ filters }: TransactionsListProps) {
           )}
 
           {!isError && (
-            /* Fixed height + scroll independiente */
-            <div className="h-[480px] overflow-y-auto">
-              <Table>
-                <TableHeader className="sticky top-0 z-10 bg-white">
-                  <TableRow className="border-gray-100">
-                    <TableHead className="pl-6 text-xs font-medium text-gray-400 w-24">Fecha</TableHead>
-                    <TableHead className="text-xs font-medium text-gray-400">Descripción</TableHead>
-                    <TableHead className="text-xs font-medium text-gray-400 w-36">Categoría</TableHead>
-                    <TableHead className="text-xs font-medium text-gray-400 w-40">Cuenta</TableHead>
-                    <TableHead className="text-right text-xs font-medium text-gray-400 w-32">Monto</TableHead>
-                    <TableHead className="pr-4 w-10" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoading &&
-                    Array.from({ length: 10 }).map((_, i) => (
-                      <TableRow key={i} className="border-gray-50">
-                        <TableCell className="pl-6"><Skeleton className="h-4 w-16" /></TableCell>
-                        <TableCell><Skeleton className="h-4 w-40" /></TableCell>
-                        <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                        <TableCell><Skeleton className="h-4 w-28" /></TableCell>
-                        <TableCell className="text-right"><Skeleton className="ml-auto h-4 w-20" /></TableCell>
-                        <TableCell />
-                      </TableRow>
-                    ))}
+            <div className="max-h-[560px] overflow-y-auto">
+              {/* Header */}
+              <div className="sticky top-0 z-10 grid grid-cols-[44px_1fr_140px_96px_120px_36px] items-center gap-3 border-b border-slate-200 bg-white px-6 py-2.5 text-xs font-medium uppercase tracking-wide text-slate-400">
+                <span />
+                <span>Descripción</span>
+                <span>Cuenta</span>
+                <span>Fecha</span>
+                <span className="text-right">Monto</span>
+                <span />
+              </div>
 
-                  {!isLoading && pageData.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={6}>
-                        <EmptyState />
-                      </TableCell>
-                    </TableRow>
-                  )}
+              {/* Rows */}
+              <motion.div layout className="divide-y divide-slate-100">
+                {isLoading &&
+                  Array.from({ length: 8 }).map((_, i) => (
+                    <div key={i} className="grid grid-cols-[44px_1fr_140px_96px_120px_36px] items-center gap-3 px-6 py-3">
+                      <Skeleton className="h-10 w-10 rounded-full" />
+                      <div className="space-y-1.5">
+                        <Skeleton className="h-3.5 w-40" />
+                        <Skeleton className="h-3 w-24" />
+                      </div>
+                      <Skeleton className="h-3 w-20" />
+                      <Skeleton className="h-3 w-14" />
+                      <Skeleton className="ml-auto h-4 w-20" />
+                      <span />
+                    </div>
+                  ))}
 
-                  {!isLoading &&
-                    pageData.map((txn) => {
+                {!isLoading && pageData.length === 0 && (
+                  <div className="px-6 py-10">
+                    <EmptyState />
+                  </div>
+                )}
+
+                {!isLoading && (
+                  <AnimatePresence mode="popLayout" initial={false}>
+                    {pageData.map((txn) => {
                       const isExpense = txn.amount < 0
+                      const catColor = getCategoryColor(txn.category)
+                      const catName = txn.category ? (slugToName.get(txn.category) ?? txn.category) : "Sin categorizar"
                       return (
-                        <TableRow key={txn.id} className="border-gray-50 hover:bg-gray-50/50">
-                          <TableCell className="pl-6 text-sm text-gray-500 whitespace-nowrap">
-                            {new Date(txn.posted_at).toLocaleDateString("es-CO", {
-                              day: "2-digit",
-                              month: "short",
-                            })}
-                          </TableCell>
+                      <motion.div
+                        key={txn.id}
+                        layout
+                        initial={{ opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.97 }}
+                        transition={{ duration: 0.18, ease: "easeOut" }}
+                        className="grid grid-cols-[44px_1fr_140px_96px_120px_36px] items-center gap-3 px-6 py-3 hover:bg-slate-50/60"
+                      >
+                        <div
+                          className="grid h-10 w-10 place-items-center rounded-full text-xl"
+                          style={{ backgroundColor: hexToRgba(catColor, 0.12) }}
+                          aria-hidden
+                        >
+                          {getCategoryIcon(txn.category)}
+                        </div>
 
-                          <TableCell className="max-w-[220px]">
-                            <p className="truncate text-sm font-medium text-gray-800">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="truncate text-sm font-medium text-slate-800">
                               {txn.merchant_guess ?? txn.description_clean}
                             </p>
-                            {txn.merchant_guess && (
-                              <p className="truncate text-xs text-gray-400">{txn.description_clean}</p>
-                            )}
-                          </TableCell>
-
-                          <TableCell>
                             <Badge
-                              className="text-xs font-medium text-white"
-                              style={{ backgroundColor: getCategoryColor(txn.category) }}
+                              className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium"
+                              style={{
+                                backgroundColor: hexToRgba(catColor, 0.12),
+                                color: catColor,
+                              }}
                             >
-                              {txn.category ? (slugToName.get(txn.category) ?? txn.category) : "Sin categorizar"}
+                              {catName}
                             </Badge>
-                          </TableCell>
+                          </div>
+                          {txn.merchant_guess && (
+                            <p className="truncate text-xs text-slate-400">{txn.description_clean}</p>
+                          )}
+                        </div>
 
-                          <TableCell className="text-sm text-gray-500 whitespace-nowrap">
-                            {txn.bank_name} · {txn.account_name}
-                          </TableCell>
+                        <div className="min-w-0 text-xs text-slate-500">
+                          <div className="truncate">{txn.account_name}</div>
+                          <div className="truncate text-slate-400">{txn.bank_name}</div>
+                        </div>
 
-                          <TableCell
-                            className={`text-right text-sm font-semibold whitespace-nowrap ${
-                              isExpense ? "text-red-500" : "text-green-600"
-                            }`}
-                          >
-                            {formatCop(txn.amount)}
-                          </TableCell>
+                        <div className="text-xs text-slate-500 whitespace-nowrap">
+                          {new Date(txn.posted_at).toLocaleDateString("es-CO", {
+                            day: "2-digit",
+                            month: "short",
+                          })}
+                        </div>
 
-                          <TableCell className="pr-4 text-right">
-                            <button
-                              onClick={() => setRecategorizing(txn)}
-                              className="rounded-lg p-1.5 text-gray-300 hover:bg-gray-100 hover:text-gray-600"
-                              title="Recategorizar"
-                            >
-                              <PencilIcon className="h-3.5 w-3.5" />
-                            </button>
-                          </TableCell>
-                        </TableRow>
+                        <div
+                          className={`text-right text-sm font-semibold tabular-nums whitespace-nowrap ${
+                            isExpense ? "text-red-500" : "text-emerald-600"
+                          }`}
+                        >
+                          {formatCop(txn.amount)}
+                        </div>
+
+                        <button
+                          onClick={() => setRecategorizing(txn)}
+                          className="grid h-8 w-8 place-items-center rounded-lg text-slate-300 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                          title="Recategorizar"
+                        >
+                          <PencilIcon className="h-3.5 w-3.5" />
+                        </button>
+                      </motion.div>
                       )
                     })}
-                </TableBody>
-              </Table>
+                  </AnimatePresence>
+                )}
+              </motion.div>
             </div>
           )}
 
-          {/* Paginación */}
           {!isError && !isLoading && total > PAGE_SIZE && (
-            <div className="flex items-center justify-between border-t border-gray-100 px-6 py-3">
+            <div className="flex items-center justify-between border-t border-slate-200 px-6 py-3">
               <button
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
                 disabled={safePage === 0}
-                className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-1 rounded-xl border border-slate-200 px-3 py-1.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ChevronLeftIcon className="h-4 w-4" />
                 Anterior
               </button>
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-slate-400">
                 Página {safePage + 1} de {totalPages}
               </span>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                 disabled={safePage >= totalPages - 1}
-                className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-1 rounded-xl border border-slate-200 px-3 py-1.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Siguiente
                 <ChevronRightIcon className="h-4 w-4" />

@@ -1,4 +1,6 @@
 import { useState } from "react"
+import { motion, AnimatePresence } from "motion/react"
+import { toast } from "sonner"
 import { Pencil, Trash2, Plus, Loader2 } from "lucide-react"
 import {
   Dialog,
@@ -47,25 +49,31 @@ export function AccountsTab() {
     if (!confirmDelete) return
     setDeleteError(null)
     deleteAccount.mutate(confirmDelete.id, {
-      onSuccess: () => setConfirmDelete(null),
-      onError: (err) => setDeleteError(err.message),
+      onSuccess: () => {
+        toast.success("Cuenta eliminada")
+        setConfirmDelete(null)
+      },
+      onError: (err) => {
+        setDeleteError(err.message)
+        toast.error(err.message)
+      },
     })
   }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-800">Cuentas</h3>
+        <h3 className="text-sm font-semibold text-slate-800">Cuentas</h3>
         <button
           onClick={handleNewAccount}
-          className="flex items-center gap-1.5 rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-700"
+          className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
         >
           <Plus className="h-3.5 w-3.5" />
           Nueva Cuenta
         </button>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100 overflow-hidden">
+      <motion.div layout className="rounded-xl border border-slate-200 bg-white divide-y divide-slate-100 overflow-hidden">
         {isLoading &&
           Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="flex items-center gap-4 px-4 py-3">
@@ -79,41 +87,51 @@ export function AccountsTab() {
           ))}
 
         {!isLoading && (!accounts || accounts.length === 0) && (
-          <p className="py-8 text-center text-sm text-gray-400">No hay cuentas registradas.</p>
+          <p className="py-8 text-center text-sm text-slate-400">No hay cuentas registradas.</p>
         )}
 
+        <AnimatePresence mode="popLayout" initial={false}>
         {accounts?.map((acc) => (
-          <div key={acc.id} className="flex items-center gap-2 px-3 py-3 hover:bg-gray-50 sm:gap-3 sm:px-4">
+          <motion.div
+            key={acc.id}
+            layout
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.97 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="flex items-center gap-2 px-3 py-3 hover:bg-slate-50 sm:gap-3 sm:px-4"
+          >
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-sm font-medium text-gray-800">
+                <p className="text-sm font-medium text-slate-800">
                   {acc.bank_name} · {TYPE_LABELS[acc.account_type] ?? acc.account_type}
                 </p>
-                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${OWNER_COLORS[acc.owner] ?? "bg-gray-100 text-gray-600"}`}>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${OWNER_COLORS[acc.owner] ?? "bg-slate-100 text-slate-600"}`}>
                   {acc.owner}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 truncate mt-0.5">{acc.account_name}</p>
+              <p className="text-xs text-slate-500 truncate mt-0.5">{acc.account_name}</p>
             </div>
             <div className="flex shrink-0 items-center gap-1">
               <button
                 title="Editar"
                 onClick={() => handleEdit(acc)}
-                className="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
               >
                 <Pencil className="h-4 w-4" />
               </button>
               <button
                 title="Eliminar"
                 onClick={() => { setDeleteError(null); setConfirmDelete(acc) }}
-                className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500"
+                className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+        </AnimatePresence>
+      </motion.div>
 
       <AccountFormDialog
         account={editingAccount}
@@ -132,7 +150,7 @@ export function AccountsTab() {
           <DialogHeader>
             <DialogTitle>¿Eliminar cuenta?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-600">
             Se eliminará <span className="font-medium">{confirmDelete?.account_name}</span>{" "}
             junto con <span className="font-semibold text-red-600">todas sus transacciones</span>.
             Esta acción no se puede deshacer.
@@ -141,7 +159,7 @@ export function AccountsTab() {
           <DialogFooter className="gap-2">
             <button
               onClick={() => { setConfirmDelete(null); setDeleteError(null) }}
-              className="rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+              className="rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
             >
               Cancelar
             </button>

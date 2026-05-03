@@ -1,14 +1,12 @@
+import { Wallet } from "lucide-react"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select"
 import { useAccounts } from "@/hooks/useAccounts"
 import type { OwnerEnum } from "@/types/api"
-
-// TODO: GAP — AccountResponse has no balance field (openapi.yaml). Cannot show saldo here.
 
 interface AccountSelectorProps {
   owner: OwnerEnum | undefined
@@ -23,10 +21,14 @@ export function AccountSelector({ owner, value, onChange }: AccountSelectorProps
     onChange(next === "__all__" ? undefined : next)
   }
 
+  const selected = accounts.find((a) => a.id === value)
+  const label = selected ? selected.bank_name : "TODAS"
+
   return (
     <Select value={value ?? "__all__"} onValueChange={handleChange} disabled={isLoading}>
-      <SelectTrigger className="w-52 rounded-full border-gray-200 bg-white text-sm">
-        <SelectValue placeholder="Todas las cuentas" />
+      <SelectTrigger className="w-auto min-w-0 gap-2 rounded-full border-slate-200 bg-white px-3 text-sm">
+        <Wallet className="h-3.5 w-3.5 text-slate-400" />
+        <span className="truncate">{label}</span>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="__all__">Todas las cuentas</SelectItem>
