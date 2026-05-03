@@ -1,4 +1,4 @@
-// Fixed color palette per category for consistent chart + badge colors
+// Fixed color palette + persisted random color for unknown categories
 export const CATEGORY_COLORS: Record<string, string> = {
   HOGAR: "#6366f1",
   DOMICILIOS: "#f97316",
@@ -22,7 +22,55 @@ export const CATEGORY_COLORS: Record<string, string> = {
   SIN_CATEGORIZAR: "#d1d5db",
 }
 
+const RANDOM_KEY = "fin-fe:catColors:v1"
+
+function loadRandom(): Record<string, string> {
+  try {
+    const raw = localStorage.getItem(RANDOM_KEY)
+    return raw ? (JSON.parse(raw) as Record<string, string>) : {}
+  } catch {
+    return {}
+  }
+}
+
+let randomColors: Record<string, string> = loadRandom()
+
+function persistRandom() {
+  try {
+    localStorage.setItem(RANDOM_KEY, JSON.stringify(randomColors))
+  } catch {
+    // ignore
+  }
+}
+
+function randomHex(): string {
+  // HSL → hex with pleasant saturation/lightness
+  const h = Math.floor(Math.random() * 360)
+  const s = 60 + Math.floor(Math.random() * 25) // 60-85
+  const l = 45 + Math.floor(Math.random() * 15) // 45-60
+  return hslToHex(h, s, l)
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  const sN = s / 100
+  const lN = l / 100
+  const k = (n: number) => (n + h / 30) % 12
+  const a = sN * Math.min(lN, 1 - lN)
+  const f = (n: number) => {
+    const color = lN - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)))
+    return Math.round(255 * color)
+      .toString(16)
+      .padStart(2, "0")
+  }
+  return `#${f(0)}${f(8)}${f(4)}`
+}
+
 export function getCategoryColor(category: string | null): string {
   if (!category) return CATEGORY_COLORS.SIN_CATEGORIZAR
-  return CATEGORY_COLORS[category] ?? CATEGORY_COLORS.OTROS
+  if (CATEGORY_COLORS[category]) return CATEGORY_COLORS[category]
+  if (randomColors[category]) return randomColors[category]
+  const color = randomHex()
+  randomColors = { ...randomColors, [category]: color }
+  persistRandom()
+  return color
 }
